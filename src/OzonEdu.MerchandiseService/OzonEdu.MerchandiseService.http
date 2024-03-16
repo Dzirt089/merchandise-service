@@ -1,0 +1,6 @@
+@OzonEdu.MerchandiseService_HostAddress = http://localhost:5222
+
+GET {{OzonEdu.MerchandiseService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
