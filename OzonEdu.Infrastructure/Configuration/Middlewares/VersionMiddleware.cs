@@ -23,6 +23,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
             try
             {
                 if (context.Response.ContentType == "application/grpc") return;
+
                 var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "no version";
                 var name = Assembly.GetExecutingAssembly().GetName().Name?.ToString() ?? "no name";
                 var versionRespons = new

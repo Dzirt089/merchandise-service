@@ -20,6 +20,8 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
         {
             try
             {
+                if (context.Response.ContentType == "application/grpc") return;
+
                 if (context.Request.ContentLength > 0)
                 {
                     context.Request.EnableBuffering();

@@ -21,6 +21,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
             try
             {
                 if (context.Response.ContentType == "application/grpc") return;
+
                 if (context.Response.ContentLength > 0)
                 {
                     var buffer = new byte[context.Response.ContentLength.Value];
