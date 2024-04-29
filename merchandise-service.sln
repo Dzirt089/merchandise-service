@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8DCAAB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService", "src\OzonEdu.MerchandiseService\OzonEdu.MerchandiseService.csproj", "{0C1846F7-64FB-4724-8D59-56002CFA63C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.Infrastructure", "OzonEdu.Infrastructure\OzonEdu.Infrastructure.csproj", "{E6BD7EE7-9677-4D83-A4B8-C9F67686C404}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.Infrastructure", "OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj", "{E6BD7EE7-9677-4D83-A4B8-C9F67686C404}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

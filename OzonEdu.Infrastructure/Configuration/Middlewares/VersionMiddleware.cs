@@ -1,22 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Reflection;
 using System.Text.Json;
 
-namespace OzonEdu.Infrastructure.Configuration.Middlewares
+namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
 {
-    public class VersionMiddleware
+    public class VersionMiddleware(RequestDelegate next, ILogger<VersionMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        public VersionMiddleware(RequestDelegate next) 
-        {
-            _next = next;
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<VersionMiddleware> _logger = logger;
 
         public async Task InvokeAsync(HttpContext context)
         {
@@ -27,15 +20,24 @@ namespace OzonEdu.Infrastructure.Configuration.Middlewares
 
         private async Task GetVersionAndName(HttpContext context)
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "no version";
-            var name = Assembly.GetExecutingAssembly().GetName().Name?.ToString() ?? "no name";
-            var versionRespons = new
+            try
             {
-                Version = version,
-                ServiceName = name,
-            };
-            var resultJson = new JsonResult(versionRespons);
-            await context.Response.WriteAsync(JsonSerializer.Serialize(resultJson));
+                if (context.Response.ContentType == "application/grpc") return;
+                var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "no version";
+                var name = Assembly.GetExecutingAssembly().GetName().Name?.ToString() ?? "no name";
+                var versionRespons = new
+                {
+                    Version = version,
+                    ServiceName = name,
+                };
+                var resultJson = new JsonResult(versionRespons);
+                await context.Response.WriteAsync(JsonSerializer.Serialize(resultJson));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Could not log Response body");
+            }
+
         }
     }
 }

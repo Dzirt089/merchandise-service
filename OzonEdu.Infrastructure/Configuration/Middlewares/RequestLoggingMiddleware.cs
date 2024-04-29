@@ -1,24 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace OzonEdu.Infrastructure.Configuration.Middlewares
+namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
 {
-    public class RequestLoggingMiddleware
+    public class RequestLoggingMiddleware(RequestDelegate next,
+        ILogger<RequestLoggingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<RequestLoggingMiddleware> _logger;
-        public RequestLoggingMiddleware(RequestDelegate next,
-            ILogger<RequestLoggingMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<RequestLoggingMiddleware> _logger = logger;
 
         public async Task InvokeAsync(HttpContext context)
         {
@@ -43,16 +33,16 @@ namespace OzonEdu.Infrastructure.Configuration.Middlewares
                     Body : {bodyAsText}
                     Headers : {context.Request.Headers}
                     Route : {context.Request.Host}");
-                    
+
                     context.Request.Body.Position = 0;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Could not log request body");
             }
 
-            
+
         }
     }
 }

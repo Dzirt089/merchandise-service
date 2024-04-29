@@ -1,23 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace OzonEdu.Infrastructure.Configuration.Middlewares
+namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
 {
-    public class ResponseLoggingMiddleware
+    public class ResponseLoggingMiddleware(RequestDelegate next,
+        ILogger<ResponseLoggingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ResponseLoggingMiddleware> _logger;
-        public ResponseLoggingMiddleware(RequestDelegate next,
-            ILogger<ResponseLoggingMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<ResponseLoggingMiddleware> _logger = logger;
 
         public async Task InvokeAsync(HttpContext context)
         {
@@ -29,6 +20,7 @@ namespace OzonEdu.Infrastructure.Configuration.Middlewares
         {
             try
             {
+                if (context.Response.ContentType == "application/grpc") return;
                 if (context.Response.ContentLength > 0)
                 {
                     var buffer = new byte[context.Response.ContentLength.Value];
