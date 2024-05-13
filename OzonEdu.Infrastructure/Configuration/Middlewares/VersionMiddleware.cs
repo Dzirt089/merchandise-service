@@ -32,7 +32,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
                     ServiceName = name,
                 };
                 var resultJson = new JsonResult(versionRespons);
-                await context.Response.WriteAsync(JsonSerializer.Serialize(resultJson));
+                await context.Response.WriteAsync(JsonSerializer.Serialize(versionRespons));
             }
             catch (Exception ex)
             {
