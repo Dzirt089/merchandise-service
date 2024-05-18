@@ -14,8 +14,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            await LogRequest(context);
-            await _next(context);
+            await LogRequest(context);            
             await LogResponse(context);
         }
 
@@ -51,18 +50,26 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
             try
             {
                 if (context.Response.ContentType == "application/grpc" || context.Response.ContentLength > 0) return;
+                var originalResponseBody = context.Response.Body;
 
                 using var streamResponse = _recyclable.GetStream();
-                await context.Response.Body.CopyToAsync(streamResponse);
-                var bodyAsText = Encoding.UTF8.GetString(streamResponse.ToArray());
+                context.Response.Body = streamResponse;
+                await _next(context);
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
+
+                var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
+
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
 
                 _logger.LogInformation
                     (
                         @$"Http Response Information : {Environment.NewLine},
-                        Body : {bodyAsText},
+                        Body : {text},
                         Headers : {context.Request.Headers},
                         Route : {context.Request.Host}"
                     );
+
+                await streamResponse.CopyToAsync(originalResponseBody);
             }
             catch (Exception ex)
             {
