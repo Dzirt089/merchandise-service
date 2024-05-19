@@ -8,12 +8,15 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddEndpointsApiExplorer();
-
+        
+        //Подключаем библиотеку почти со всеми подключениями (Сваггер, логги, фильтры, контроллер). Чтобы не засорять основной проект.
         builder.Services.AddInfrastructure();
         builder.Services.AddSingleton<IMerchService, MerchService>();
 
         var app = builder.Build();
 
+        //Подключаем Миддлеваре из библиотеки "RequestResponseLoggingMiddleware", напрямую тут.
+        //Пока не разобрался, как в библиотеке "Infrastructure" подключить, чтобы работало.
         app.UseMiddleware<RequestResponseLoggingMiddleware>();
         app.UseHttpsRedirection();
 

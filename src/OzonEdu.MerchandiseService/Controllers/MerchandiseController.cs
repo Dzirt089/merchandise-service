@@ -16,7 +16,7 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="token">токен отмены</param>
         /// <returns>Список данных по мерчу со склада</returns>
         [HttpGet]
-        public async Task<ActionResult<List<MerchItem>>> GetAllMerch(CancellationToken token) => await _merchService.GetAll(token);
+        public async Task<ActionResult<List<MerchItem>>> GetAllMerch(CancellationToken token) => Ok(await _merchService.GetAll(token));
 
         /// <summary>
         /// Получаем инфу по конкретному мерчу со склада
@@ -25,6 +25,11 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="id">идентификатор мерча для склада</param>
         /// <returns>данные по одному мерчу со склада</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<MerchItem>> GetById(CancellationToken token, long id) => await _merchService.GetById(id, token);
+        public async Task<ActionResult<MerchItem>> GetById(CancellationToken token, long id)
+        {
+            var result = await _merchService.GetById(id, token);
+            if (result is null) return NotFound();
+            return Ok(result);
+        }
     }
 }
