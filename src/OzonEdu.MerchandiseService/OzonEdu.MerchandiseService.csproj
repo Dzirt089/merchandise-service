@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj" />
   </ItemGroup>
 
 </Project>

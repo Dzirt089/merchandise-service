@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OzonEdu.MerchandiseService.Http.Services;
 using OzonEdu.MerchandiseService.Services;
 
 namespace OzonEdu.MerchandiseService.Controllers
@@ -16,7 +17,21 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="token">токен отмены</param>
         /// <returns>Список данных по мерчу со склада</returns>
         [HttpGet]
-        public async Task<ActionResult<List<MerchItem>>> GetAllMerch(CancellationToken token) => Ok(await _merchService.GetAll(token));
+        public async Task<ActionResult<List<HttpItem>>> GetAllMerch(CancellationToken token)
+        {
+            var result = await _merchService.GetAll(token);
+            List<HttpItem> items = new List<HttpItem>();
+            foreach (var item in result)
+            {
+                items.Add(new HttpItem
+                {
+                    IdClient = item.Id,
+                    ItemNameClient = item.ItemName,
+                    QuantityClient = item.Quantity,
+                });
+            }
+            return Ok(items);
+        }
 
         /// <summary>
         /// Получаем инфу по конкретному мерчу со склада
@@ -25,11 +40,16 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="id">идентификатор мерча для склада</param>
         /// <returns>данные по одному мерчу со склада</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<MerchItem>> GetById(CancellationToken token, long id)
+        public async Task<ActionResult<HttpItem>> GetById(CancellationToken token, long id)
         {
             var result = await _merchService.GetById(id, token);
             if (result is null) return NotFound();
-            return Ok(result);
+            return Ok(new HttpItem
+            {
+                IdClient = result.Id,
+                ItemNameClient = result.ItemName,
+                QuantityClient = result.Quantity,
+            });
         }
     }
 }

@@ -15,17 +15,17 @@
         /// <summary>
         /// Идентификатор мерча
         /// </summary>
-        public long Id { get; }
+        public long Id { get; set; }
 
 
         /// <summary>
         /// Наименования меча
         /// </summary>
-        public string ItemName { get; }
+        public string ItemName { get; set; }
 
         /// <summary>
         /// Остаток на складе позиции мерча
         /// </summary>
-        public int Quantity { get; }
+        public int Quantity { get; set; }
     }
 }
