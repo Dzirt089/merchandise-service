@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj" />
+    <ProjectReference Include="..\..\OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj" />
     <ProjectReference Include="..\..\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj" />
   </ItemGroup>
 

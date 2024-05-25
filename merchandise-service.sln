@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Infrastructure", "OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj", "{E6BD7EE7-9677-4D83-A4B8-C9F67686C404}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.ConsoleHttpClient", "OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj", "{0C60DC2B-6D87-465B-BFBE-0A3508E880D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.ConsoleHttpClient", "OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj", "{0C60DC2B-6D87-465B-BFBE-0A3508E880D5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Http", "OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj", "{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.Grpc", "OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj", "{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +58,7 @@ Global
 		{E6BD7EE7-9677-4D83-A4B8-C9F67686C404} = {B35D9F88-74AE-4357-850D-00B4AF0872F9}
 		{0C60DC2B-6D87-465B-BFBE-0A3508E880D5} = {B35D9F88-74AE-4357-850D-00B4AF0872F9}
 		{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D} = {B35D9F88-74AE-4357-850D-00B4AF0872F9}
+		{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E} = {B35D9F88-74AE-4357-850D-00B4AF0872F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3221F78E-D44A-4118-9A91-CD0EF308C3E9}
