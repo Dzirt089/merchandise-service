@@ -13,7 +13,8 @@ namespace OzonEdu.MerchandiseService.Http.Services
     public class HttpService(HttpClient client) : IHttpService
     {
         private readonly HttpClient _client = client;
-        private readonly string _url = "http://localhost:5222/";
+        private readonly string ACTION = "Merchandise";
+        private readonly string URL = "http://localhost:5222";
 
         /// <summary>
         /// Дергаем апишку, чтобы получить все данные по мерчу
@@ -22,7 +23,7 @@ namespace OzonEdu.MerchandiseService.Http.Services
         /// <returns>список данных мерча по складу</returns>
         public async Task<List<HttpItem>> GetAll(CancellationToken token)
         {
-            using var response = await _client.GetAsync(_url+$"v1/api/merch", token);
+            using var response = await _client.GetAsync(@$"{URL}/{ACTION}/GetAllMerch", token);
             var body = await response.Content.ReadAsStringAsync(token);
             var result = JsonSerializer.Deserialize<List<HttpItem>>(body);
             return result;
@@ -36,7 +37,7 @@ namespace OzonEdu.MerchandiseService.Http.Services
         /// <returns>инфа товара</returns>
         public async Task<HttpItem> GetById(long id, CancellationToken token)
         {
-            using var response = await _client.GetAsync(_url+$"v1/api/merch/{id}", token);
+            using var response = await _client.GetAsync(@$"{URL}/{ACTION}/GetById/{id}", token);
             var body = await response.Content.ReadAsStringAsync(token);
             var result = JsonSerializer.Deserialize<HttpItem>(body);
             return result;

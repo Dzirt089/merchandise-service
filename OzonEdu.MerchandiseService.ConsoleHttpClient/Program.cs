@@ -8,5 +8,9 @@ class Program
     {
         List<HttpItem> items = await _service.GetAll(CancellationToken.None);
         HttpItem item = await _service.GetById(2, CancellationToken.None);
+        foreach (var temp in items)
+            await Console.Out.WriteLineAsync(temp.ToString());
+        await Console.Out.WriteLineAsync(item.ToString());
+        Console.ReadLine();
     }
 }

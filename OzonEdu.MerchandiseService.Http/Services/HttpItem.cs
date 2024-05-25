@@ -11,29 +11,31 @@ namespace OzonEdu.MerchandiseService.Http.Services
     {
         public HttpItem(long id, string itemName, int quantity)
         {
-            IdClient = id;
-            ItemNameClient = itemName;
-            QuantityClient = quantity;
+            IdPosition = id;
+            ItemNamePosition = itemName;
+            QuantityPosition = quantity;
         }
         public HttpItem() { }
 
         /// <summary>
         /// Идентификатор мерча
         /// </summary>
-        [JsonPropertyName("IdClient")]
-        public long IdClient { get; set; }
+        [JsonPropertyName("IdPosition")]
+        public long IdPosition { get; set; }
 
 
         /// <summary>
         /// Наименования меча
         /// </summary>
-        [JsonPropertyName("ItemNameClient")]
-        public string ItemNameClient { get; set; }
+        [JsonPropertyName("ItemNamePosition")]
+        public string ItemNamePosition { get; set; }
 
         /// <summary>
         /// Остаток на складе позиции мерча
         /// </summary>
-        [JsonPropertyName("QuantityClient")]
-        public int QuantityClient { get; set; }
+        [JsonPropertyName("QuantityPosition")]
+        public int QuantityPosition { get; set; }
+
+        public override string ToString() => $"{IdPosition}, {ItemNamePosition}, {QuantityPosition}";
     }
 }

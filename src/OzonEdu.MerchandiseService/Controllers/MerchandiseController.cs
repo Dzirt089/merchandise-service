@@ -4,9 +4,9 @@ using OzonEdu.MerchandiseService.Services;
 
 namespace OzonEdu.MerchandiseService.Controllers
 {
+
+    [Route("[controller]")]
     [ApiController]
-    [Produces("application/json")]
-    [Route("v1/api/merch")]
     public class MerchandiseController(IMerchService merch) : ControllerBase
     {
         private readonly IMerchService _merchService = merch;
@@ -16,7 +16,7 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// </summary>
         /// <param name="token">токен отмены</param>
         /// <returns>Список данных по мерчу со склада</returns>
-        [HttpGet]
+        [HttpGet("[action]")]
         public async Task<ActionResult<List<HttpItem>>> GetAllMerch(CancellationToken token)
         {
             var result = await _merchService.GetAll(token);
@@ -25,9 +25,9 @@ namespace OzonEdu.MerchandiseService.Controllers
             {
                 items.Add(new HttpItem
                 {
-                    IdClient = item.Id,
-                    ItemNameClient = item.ItemName,
-                    QuantityClient = item.Quantity,
+                    IdPosition = item.Id,
+                    ItemNamePosition = item.ItemName,
+                    QuantityPosition = item.Quantity,
                 });
             }
             return Ok(items);
@@ -39,16 +39,16 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="token">токен отмены</param>
         /// <param name="id">идентификатор мерча для склада</param>
         /// <returns>данные по одному мерчу со склада</returns>
-        [HttpGet("{id}")]
-        public async Task<ActionResult<HttpItem>> GetById(CancellationToken token, long id)
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult<HttpItem>> GetById(long id, CancellationToken token)
         {
             var result = await _merchService.GetById(id, token);
             if (result is null) return NotFound();
             return Ok(new HttpItem
             {
-                IdClient = result.Id,
-                ItemNameClient = result.ItemName,
-                QuantityClient = result.Quantity,
+                IdPosition = result.Id,
+                ItemNamePosition = result.ItemName,
+                QuantityPosition = result.Quantity,
             });
         }
     }
