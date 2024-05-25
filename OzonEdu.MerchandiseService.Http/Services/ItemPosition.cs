@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 
 namespace OzonEdu.MerchandiseService.Http.Services
 {
-    public class HttpItem
+    /// <summary>
+    /// Модель мерча на стороне клиента. 
+    /// </summary>
+    public class ItemPosition
     {
-        public HttpItem(long id, string itemName, int quantity)
+        public ItemPosition(long id, string itemName, int quantity)
         {
             IdPosition = id;
             ItemNamePosition = itemName;
             QuantityPosition = quantity;
         }
-        public HttpItem() { }
+        public ItemPosition() { }
 
         /// <summary>
         /// Идентификатор мерча

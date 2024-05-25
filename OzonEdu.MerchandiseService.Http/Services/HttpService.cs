@@ -21,11 +21,11 @@ namespace OzonEdu.MerchandiseService.Http.Services
         /// </summary>
         /// <param name="token">токен отмены</param>
         /// <returns>список данных мерча по складу</returns>
-        public async Task<List<HttpItem>> GetAll(CancellationToken token)
+        public async Task<List<ItemPosition>> GetAll(CancellationToken token)
         {
             using var response = await _client.GetAsync(@$"{URL}/{ACTION}/GetAllMerch", token);
             var body = await response.Content.ReadAsStringAsync(token);
-            var result = JsonSerializer.Deserialize<List<HttpItem>>(body);
+            var result = JsonSerializer.Deserialize<List<ItemPosition>>(body);
             return result;
         }
 
@@ -35,11 +35,11 @@ namespace OzonEdu.MerchandiseService.Http.Services
         /// <param name="id">идентификатор товара</param>
         /// <param name="token">токен отмены</param>
         /// <returns>инфа товара</returns>
-        public async Task<HttpItem> GetById(long id, CancellationToken token)
+        public async Task<ItemPosition> GetById(long id, CancellationToken token)
         {
             using var response = await _client.GetAsync(@$"{URL}/{ACTION}/GetById/{id}", token);
             var body = await response.Content.ReadAsStringAsync(token);
-            var result = JsonSerializer.Deserialize<HttpItem>(body);
+            var result = JsonSerializer.Deserialize<ItemPosition>(body);
             return result;
         }
     }

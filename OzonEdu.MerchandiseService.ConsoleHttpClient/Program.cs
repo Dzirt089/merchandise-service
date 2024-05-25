@@ -6,8 +6,8 @@ class Program
 
     static async Task Main(string[] args)
     {
-        List<HttpItem> items = await _service.GetAll(CancellationToken.None);
-        HttpItem item = await _service.GetById(2, CancellationToken.None);
+        List<ItemPosition> items = await _service.GetAll(CancellationToken.None);
+        ItemPosition item = await _service.GetById(2, CancellationToken.None);
         foreach (var temp in items)
             await Console.Out.WriteLineAsync(temp.ToString());
         await Console.Out.WriteLineAsync(item.ToString());

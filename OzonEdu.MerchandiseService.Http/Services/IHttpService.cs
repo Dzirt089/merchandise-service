@@ -2,7 +2,7 @@
 {
     public interface IHttpService
     {
-        Task<List<HttpItem>> GetAll(CancellationToken token);
-        Task<HttpItem> GetById(long id, CancellationToken token);
+        Task<List<ItemPosition>> GetAll(CancellationToken token);
+        Task<ItemPosition> GetById(long id, CancellationToken token);
     }
 }

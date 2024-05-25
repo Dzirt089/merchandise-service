@@ -17,13 +17,13 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="token">токен отмены</param>
         /// <returns>Список данных по мерчу со склада</returns>
         [HttpGet("[action]")]
-        public async Task<ActionResult<List<HttpItem>>> GetAllMerch(CancellationToken token)
+        public async Task<ActionResult<List<ItemPosition>>> GetAllMerch(CancellationToken token)
         {
             var result = await _merchService.GetAll(token);
-            List<HttpItem> items = new List<HttpItem>();
+            List<ItemPosition> items = new List<ItemPosition>();
             foreach (var item in result)
             {
-                items.Add(new HttpItem
+                items.Add(new ItemPosition
                 {
                     IdPosition = item.Id,
                     ItemNamePosition = item.ItemName,
@@ -40,11 +40,11 @@ namespace OzonEdu.MerchandiseService.Controllers
         /// <param name="id">идентификатор мерча для склада</param>
         /// <returns>данные по одному мерчу со склада</returns>
         [HttpGet("[action]/{id}")]
-        public async Task<ActionResult<HttpItem>> GetById(long id, CancellationToken token)
+        public async Task<ActionResult<ItemPosition>> GetById(long id, CancellationToken token)
         {
             var result = await _merchService.GetById(id, token);
             if (result is null) return NotFound();
-            return Ok(new HttpItem
+            return Ok(new ItemPosition
             {
                 IdPosition = result.Id,
                 ItemNamePosition = result.ItemName,
