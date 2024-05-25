@@ -25,7 +25,7 @@ namespace OzonEdu.MerchandiseService.Http.Services
         {
             using var response = await _client.GetAsync(@$"{URL}/{ACTION}/GetAllMerch", token);
             var body = await response.Content.ReadAsStringAsync(token);
-            var result = JsonSerializer.Deserialize<List<ItemPosition>>(body);
+            var result = JsonSerializer.Deserialize<List<ItemPosition>>(body) ?? [];
             return result;
         }
 
@@ -39,7 +39,7 @@ namespace OzonEdu.MerchandiseService.Http.Services
         {
             using var response = await _client.GetAsync(@$"{URL}/{ACTION}/GetById/{id}", token);
             var body = await response.Content.ReadAsStringAsync(token);
-            var result = JsonSerializer.Deserialize<ItemPosition>(body);
+            var result = JsonSerializer.Deserialize<ItemPosition>(body) ?? new();
             return result;
         }
     }
