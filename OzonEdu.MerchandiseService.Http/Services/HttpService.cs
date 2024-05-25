@@ -14,7 +14,7 @@ namespace OzonEdu.MerchandiseService.Http.Services
     {
         private readonly HttpClient _client = client;
         private readonly string ACTION = "Merchandise";
-        private readonly string URL = "http://localhost:5222";
+        private readonly string URL = "http://localhost:5222"; //TODO: адрес забить в appsettings.json
 
         /// <summary>
         /// Дергаем апишку, чтобы получить все данные по мерчу
