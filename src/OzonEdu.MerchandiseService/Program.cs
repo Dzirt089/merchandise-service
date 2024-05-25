@@ -6,11 +6,18 @@ public class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        //Создаю кофигурацию, чтобы библиотечке считать данные с неё
+        IConfigurationRoot _configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+
 
         builder.Services.AddEndpointsApiExplorer();
         
         //Подключаем библиотеку почти со всеми подключениями (Сваггер, логги, фильтры, контроллер). Чтобы не засорять основной проект.
-        builder.Services.AddInfrastructure();
+        builder.Services.AddInfrastructure(_configuration);
         builder.Services.AddSingleton<IMerchService, MerchService>();
 
         var app = builder.Build();
