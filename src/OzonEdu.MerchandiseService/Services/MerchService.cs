@@ -6,13 +6,13 @@ namespace OzonEdu.MerchandiseService.Services
         /// <summary>
         /// Пример притянут за уши, естественно данные будем получать из запроса в БД. 
         /// </summary>
-        private readonly List<MerchItem> MerchItems = new List<MerchItem>()
-        {
+        private readonly List<MerchItem> MerchItems =
+        [
             new MerchItem(1, "Кепка", 150),
             new MerchItem(2, "Футболка", 230),
             new MerchItem(3, "Толстовка", 70),
             new MerchItem(4, "Перчатки", 250),
-        };
+        ];
 
         /// <summary>
         /// Получаем все остатки мерча на складе 

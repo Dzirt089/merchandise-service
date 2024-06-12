@@ -41,7 +41,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
         {
             try
             {
-                if (context.Request.ContentType == "application/grpc" || context.Request.ContentLength > 0) return;
+                if (context.Request.ContentType == "application/grpc" || context.Request.ContentLength == 0 || context.Request.ContentLength is null) return;
 
                 //Включаем буфер. Чтобы мы могли перематывать Body как касету после чтения, обратно на начало.
                 context.Request.EnableBuffering();
@@ -74,7 +74,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
         {
             try
             {
-                if (context.Response.ContentType == "application/grpc" || context.Response.ContentLength > 0) return;
+                if (context.Response.ContentType == "application/grpc" || context.Response.ContentLength == 0 || context.Request.ContentLength is null) return;
                 
                 //копируем перед работой, содержимое стрима ответа. Иначе после работы с ним, ответ "потеряется".
                 var originalResponseBody = context.Response.Body;

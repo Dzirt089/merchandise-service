@@ -12,6 +12,7 @@ public class Program
         //Подключаем сервисы библиотеки почти со всеми подключениями (Сваггер, логги, фильтры, контроллер).        
         builder.Services.AddInfrastructure();
         builder.Services.AddSingleton<IMerchService, MerchService>();
+        builder.Services.AddGrpc();
 
         var app = builder.Build();
 
@@ -20,6 +21,8 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
+
+        app.MapGrpcService<MerchApiGrpsService>();
         app.MapControllers();
         app.Run();
     }

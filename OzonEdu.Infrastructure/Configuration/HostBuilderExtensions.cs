@@ -53,7 +53,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration
         /// <returns></returns>
         public static IApplicationBuilder AddInfrastructureMiddleware(this IApplicationBuilder app)
         {
-            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            //app.UseMiddleware<RequestResponseLoggingMiddleware>();
             return app;
         }
     }
