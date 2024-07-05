@@ -1,4 +1,6 @@
-﻿namespace OzonEdu.MerchandiseService.Services
+﻿using OzonEdu.MerchandiseService.Models;
+
+namespace OzonEdu.MerchandiseService.Services
 {
     public interface IMerchService
     {

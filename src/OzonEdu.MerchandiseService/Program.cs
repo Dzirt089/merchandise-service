@@ -1,3 +1,4 @@
+using OzonEdu.MerchandiseService.GrpcServices;
 using OzonEdu.MerchandiseService.Infrastructure.Configuration;
 using OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares;
 using OzonEdu.MerchandiseService.Services;

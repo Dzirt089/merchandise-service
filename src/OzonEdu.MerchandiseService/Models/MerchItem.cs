@@ -1,4 +1,4 @@
-﻿namespace OzonEdu.MerchandiseService.Services
+﻿namespace OzonEdu.MerchandiseService.Models
 {
     /// <summary>
     /// Модель мерча (перчатки, фуутболка и т.д.)
