@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OzonEdu.MerchandiseService.Infrastructure.Configuration.Filters;
+using OzonEdu.MerchandiseService.Infrastructure.Configuration.Interceptors;
 using OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares;
 using OzonEdu.MerchandiseService.Infrastructure.Configuration.StartapFilters;
 using System.Runtime.CompilerServices;
@@ -42,6 +43,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration
             services.AddSingleton<IStartupFilter, SwaggerStartupFilter>();
             services.AddSingleton<IStartupFilter, TerminalStartupFilter>();
             services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
+            services.AddGrpc(services => services.Interceptors.Add<LoggingInterceptor>());
 
             return services;
         }
@@ -53,7 +55,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration
         /// <returns></returns>
         public static IApplicationBuilder AddInfrastructureMiddleware(this IApplicationBuilder app)
         {
-            //app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
             return app;
         }
     }

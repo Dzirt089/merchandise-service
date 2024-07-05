@@ -30,7 +30,8 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
         {
             await LogRequest(context);            
             await LogResponse(context);
-        }
+			await _next(context);
+		}
 
         /// <summary>
         /// Метод для логирования информации о входящем запросе
