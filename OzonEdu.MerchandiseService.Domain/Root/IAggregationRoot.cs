@@ -1,4 +1,4 @@
-﻿namespace OzonEdu.MerchandiseService.Domain.Models
+﻿namespace OzonEdu.MerchandiseService.Domain.Root
 {
 	/// <summary>
 	/// Флаг того, что "этот" Entity может являться корнем агрегата

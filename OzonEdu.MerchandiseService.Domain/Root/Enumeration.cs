@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace OzonEdu.MerchandiseService.Domain.Models
+namespace OzonEdu.MerchandiseService.Domain.Root
 {
 	/// <summary>
 	/// Класс перечесления вместо типов перечисления
@@ -8,11 +8,34 @@ namespace OzonEdu.MerchandiseService.Domain.Models
 	/// </summary>
 	public abstract class Enumeration : IComparable
 	{
+		/// <summary>
+		/// Название перечисления
+		/// </summary>
 		public string Name { get; private set; }
+
+		/// <summary>
+		/// Идентификатор перечисления
+		/// </summary>
 		public int Id { get; private set; }
+
+		/// <summary>
+		/// Конструктор перечисления
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="name"></param>
 		protected Enumeration(int id, string name) => (Id, Name) = (id, name);
+
+		/// <summary>
+		/// Преобразование в строку
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString() => Name;
 
+		/// <summary>
+		/// Получить все значения перечисления
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public static IEnumerable<T> GetAll<T>() where T : Enumeration =>
 			typeof(T).GetFields(BindingFlags.Public |
 								BindingFlags.Static |
@@ -20,6 +43,11 @@ namespace OzonEdu.MerchandiseService.Domain.Models
 			.Select(f => f.GetValue(null))
 			.Cast<T>();
 
+		/// <summary>
+		/// Сравнение сущностей
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		public override bool Equals(object? obj)
 		{
 			if (obj is not Enumeration otherValue) return false;
@@ -30,6 +58,11 @@ namespace OzonEdu.MerchandiseService.Domain.Models
 			return typeMatches && valueMathes;
 		}
 
+		/// <summary>
+		/// Сравнение сущностей
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
 		public int CompareTo(object other) => Id.CompareTo(((Enumeration)other).Id);
 	}
 }
