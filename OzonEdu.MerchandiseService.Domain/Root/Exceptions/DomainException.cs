@@ -1,7 +1,8 @@
 ﻿namespace OzonEdu.MerchandiseService.Domain.Root.Exceptions
 {
 	/// <summary>
-	/// Исключение доменной модели
+	/// Общее исключение доменной модели
+	/// TODO: лучше использовать определенные исключения для конкретных случаев
 	/// </summary>
 	[Serializable]
 	public class DomainException : Exception
