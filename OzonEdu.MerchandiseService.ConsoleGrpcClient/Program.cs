@@ -1,7 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Google.Protobuf.WellKnownTypes;
+
 using Grpc.Net.Client;
+
 using OzonEdu.MerchandiseService.Grpc;
 
 

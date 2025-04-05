@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
+
 using System.Text;
 
 namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
@@ -17,7 +18,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
 		private readonly ILogger<RequestResponseLoggingMiddleware> _logger = logger;
 
 		/// <summary>
-		/// Использование (Естественно с using) RecyclableMemoryStreamManager, позволяет избежать утечки памяти при использовании потоков. 
+		/// Использование (Естественно с using при применении) RecyclableMemoryStreamManager, позволяет избежать утечки памяти при использовании потоков. 
 		/// </summary>
 		private readonly RecyclableMemoryStreamManager _recyclable = new();
 
