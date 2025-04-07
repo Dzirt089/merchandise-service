@@ -9,7 +9,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 	public class Sku : ValueObject
 	{
 		/// <summary>
-		/// Конструктор
+		/// Приватный конструктор 
 		/// </summary>
 		/// <param name="value"></param>
 		private Sku(long value)
