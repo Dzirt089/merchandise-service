@@ -19,7 +19,7 @@ namespace OzonEdu.MerchandiseService.Domain.Root
 		/// <summary>
 		/// Идентификатор сущности
 		/// </summary>
-		public virtual int Id { get; protected set; }
+		public virtual long Id { get; protected set; }
 
 		/// <summary>
 		/// Список доменных событий

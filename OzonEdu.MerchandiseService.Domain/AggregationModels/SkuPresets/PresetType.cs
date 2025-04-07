@@ -1,7 +1,7 @@
 ﻿using OzonEdu.MerchandiseService.Domain.Root;
 using OzonEdu.MerchandiseService.Domain.Root.Exceptions;
 
-namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPreset
+namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 {
 
 	/// <summary>
