@@ -3,6 +3,9 @@ using OzonEdu.MerchandiseService.Domain.Root.Exceptions;
 
 namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 {
+	/// <summary>
+	/// Идентификатор набора мерча
+	/// </summary>
 	public sealed class SkuPreset : Entity
 	{
 		public SkuPreset(long id, IReadOnlyCollection<Sku> skus, PresetType type)

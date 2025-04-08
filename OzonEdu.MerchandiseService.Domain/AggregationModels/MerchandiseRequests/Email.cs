@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests
 {
+	/// <summary>
+	/// Email сотрудника
+	/// </summary>
 	public class Email : ValueObject
 	{
 		/// <summary>
