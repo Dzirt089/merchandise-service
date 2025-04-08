@@ -15,20 +15,20 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <param name="employee">Информация о сотруднике</param>
 		/// <param name="status">Статус заявки на выдачу мерча</param>
 		/// <param name="createdAt">Дата создания запроса</param>
-		/// <param name="gaveOutAt">Дата выдачи мерча по запросу</param>
+		/// <param name="giveOutAt">Дата выдачи мерча по запросу</param>
 		public MerchandiseRequest(long id,
 			SkuPreset skuPreset,
 			Employee employee,
 			MerchandiseRequestStatus status,
 			DateTimeOffset createdAt,
-			DateTimeOffset? gaveOutAt)
+			DateTimeOffset? giveOutAt)
 		{
 			Id = id;
 			SkuPreset = skuPreset;
 			Employee = employee;
 			Status = status;
 			CreatedAt = createdAt;
-			GaveOutAt = gaveOutAt;
+			GiveOutAt = giveOutAt;
 		}
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <summary>
 		/// Дата выдачи мерча по запросу
 		/// </summary>
-		public DateTimeOffset? GaveOutAt { get; private set; }
+		public DateTimeOffset? GiveOutAt { get; private set; }
 
 		private MerchandiseRequest(
 			SkuPreset skuPreset,
@@ -93,24 +93,28 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// Выдаем мерч
 		/// </summary>
 		/// <param name="isAvailable">Флаг от StockApi сервиса, обозначает возможность забронирования мерча на складе</param>
-		/// <param name="gaveOutAt">Дата предполагаемой выдачи</param>
-		public void GiveOut(bool isAvailable, DateTimeOffset gaveOutAt)
+		/// <param name="giveOutAt">Дата предполагаемой выдачи</param>
+		public MerchandiseRequestStatus GiveOut(bool isAvailable, DateTimeOffset giveOutAt)
 		{
 			if (Equals(Status, MerchandiseRequestStatus.New) || Equals(Status, MerchandiseRequestStatus.Processing))
 			{
 				if (isAvailable)
 				{
 					Status = MerchandiseRequestStatus.Done;
-					GaveOutAt = gaveOutAt;
+					GiveOutAt = giveOutAt;
 
 					//Бросаем доменное событие, что выдали такой-то набор мерча определенному сотруднику
-					AddDomainEvent(new MerchandiseRequestGaveOut
+					AddDomainEvent(new MerchandiseRequestGiveOut
 					{
 						SkuPreset = SkuPreset,
 						Employee = Employee,
 					});
 				}//Или переводим в статус в процессе
-				else Status = MerchandiseRequestStatus.Processing;
+				else
+				{
+					Status = MerchandiseRequestStatus.Processing;
+				}
+				return Status;
 			}
 			else
 			{

@@ -8,7 +8,7 @@
 		/// <param name="merchandiseRequest"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
-		Task<int> CreateAsync(MerchandiseRequest merchandiseRequest, CancellationToken cancellationToken);
+		Task<long> CreateAsync(MerchandiseRequest merchandiseRequest, CancellationToken cancellationToken);
 
 		/// <summary>
 		/// Обновление заявки на выдачу мерча
