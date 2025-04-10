@@ -5,7 +5,7 @@ namespace OzonEdu.MerchandiseService.Application.Commands.NewMerchandiseAppeared
 	/// <summary>
 	/// Прибыл новый набор мерча
 	/// </summary>
-	public record NewMerchandiseAppearedCommand : IRequest<Unit>
+	public record NewMerchandiseAppearedCommand : IRequest
 	{
 		/// <summary>
 		/// Набор доступных артикулов
