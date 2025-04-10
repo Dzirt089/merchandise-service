@@ -7,7 +7,7 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.In
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
-	public class GetRequestsByEmployeeQueryHandler : IRequestHandler<GetRequestsByEmployeeQuery, GetRequestsByEmployeeQueryResponse>
+	public sealed class GetRequestsByEmployeeQueryHandler : IRequestHandler<GetRequestsByEmployeeQuery, GetRequestsByEmployeeQueryResponse>
 	{
 		private readonly IMerchandiseRepository _merchandiseRepository;
 

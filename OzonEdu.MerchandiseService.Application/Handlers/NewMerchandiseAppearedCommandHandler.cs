@@ -7,7 +7,7 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.In
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
-	public class NewMerchandiseAppearedCommandHandler : IRequestHandler<NewMerchandiseAppearedCommand>
+	public sealed class NewMerchandiseAppearedCommandHandler : IRequestHandler<NewMerchandiseAppearedCommand>
 	{
 		private readonly IMerchandiseRepository _merchandiseRepository;
 		private readonly IStockApiIntegration _stockApiIntegration;

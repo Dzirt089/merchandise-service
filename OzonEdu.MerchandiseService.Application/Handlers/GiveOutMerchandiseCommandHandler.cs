@@ -10,7 +10,7 @@ using OzonEdu.MerchandiseService.Domain.Root.Exceptions;
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
-	public class GiveOutMerchandiseCommandHandler : IRequestHandler<GiveOutMerchandiseCommand, bool>
+	public sealed class GiveOutMerchandiseCommandHandler : IRequestHandler<GiveOutMerchandiseCommand, bool>
 	{
 		private readonly IMerchandiseRepository _merchandiseRepository;
 		private readonly ISkuPresetRepository _skuPresetRepository;

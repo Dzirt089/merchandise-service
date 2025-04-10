@@ -7,7 +7,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 	/// <summary>
 	/// Событие, которое возникает при отклонении заявки на выдачу мерча
 	/// </summary>
-	public sealed class MerchandiseRequestDeclined : INotification
+	public sealed record MerchandiseRequestDeclined : INotification
 	{
 		/// <summary>
 		/// Сотрудник, которому выдаем мерч

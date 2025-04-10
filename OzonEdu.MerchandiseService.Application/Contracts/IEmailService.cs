@@ -4,6 +4,6 @@ namespace OzonEdu.MerchandiseService.Application.Contracts
 {
 	public interface IEmailService
 	{
-		Task SendEmail(Email email, string statusRequestName, object obj);
+		Task SendEmail(Email email, object obj);
 	}
 }
