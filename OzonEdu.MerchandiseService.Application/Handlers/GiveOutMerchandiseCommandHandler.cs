@@ -85,7 +85,7 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 			if (Equals(statusRequest.Name, MerchandiseRequestStatus.Done))
 			{
 				//Отправляем уведомление на почту
-				await _emailService.SendEmail(newMerchandiseRequest.Employee.Email, statusRequest.Name, new object());
+				await _emailService.SendEmail(newMerchandiseRequest.Employee.Email, new object());
 			}
 
 			return true;
