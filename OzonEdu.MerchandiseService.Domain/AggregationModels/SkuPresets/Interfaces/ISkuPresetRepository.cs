@@ -1,6 +1,8 @@
-﻿namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets.Interfaces
+﻿using OzonEdu.MerchandiseService.Domain.Contracts;
+
+namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets.Interfaces
 {
-	public interface ISkuPresetRepository
+	public interface ISkuPresetRepository : IRepository<SkuPreset>
 	{
 		/// <summary>
 		/// Сохранение набора мерча

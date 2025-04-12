@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using System.Reflection;
 
-using System.Reflection;
-
-namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.StartapFilters
+namespace OzonEdu.MerchandiseService.Infrastructure.StartapFilters
 {
 	public class TerminalStartupFilter : IStartupFilter
 	{

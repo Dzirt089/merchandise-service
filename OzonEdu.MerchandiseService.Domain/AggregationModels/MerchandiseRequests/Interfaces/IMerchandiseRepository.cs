@@ -1,6 +1,8 @@
-﻿namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Interfaces
+﻿using OzonEdu.MerchandiseService.Domain.Contracts;
+
+namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Interfaces
 {
-	public interface IMerchandiseRepository
+	public interface IMerchandiseRepository : IRepository<MerchandiseRequest>
 	{
 		/// <summary>
 		/// Создание заявки на выдачу мерча

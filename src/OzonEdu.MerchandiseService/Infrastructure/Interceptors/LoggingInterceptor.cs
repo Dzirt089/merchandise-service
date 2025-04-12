@@ -1,10 +1,8 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Interceptors;
 
-using Microsoft.Extensions.Logging;
-
 using System.Text.Json;
-namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Interceptors
+namespace OzonEdu.MerchandiseService.Infrastructure.Interceptors
 {
 	/// <summary>
 	/// Interceptor - компонент в логгировании grpc, который получает доступ к уже десереализованному сообщению.

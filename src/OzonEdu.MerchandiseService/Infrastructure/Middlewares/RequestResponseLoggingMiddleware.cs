@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Microsoft.IO;
+﻿using Microsoft.IO;
 
 using System.Text;
 
-namespace OzonEdu.MerchandiseService.Infrastructure.Configuration.Middlewares
+namespace OzonEdu.MerchandiseService.Infrastructure.Middlewares
 {
 	/// <summary>
 	/// Middleware, который логгирует входящие и исходящие HTTP-запросы и ответы
