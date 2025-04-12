@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/src/OzonEdu.MerchandiseService/Logs/app-20240525.txt
+/src/OzonEdu.MerchandiseService/Logs/app-20240612.txt
+/src/OzonEdu.MerchandiseService/Logs/app-20240705.txt
