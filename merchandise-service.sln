@@ -15,21 +15,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8DCAAB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService", "src\OzonEdu.MerchandiseService\OzonEdu.MerchandiseService.csproj", "{0C1846F7-64FB-4724-8D59-56002CFA63C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Infrastructure", "OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj", "{E6BD7EE7-9677-4D83-A4B8-C9F67686C404}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Infrastructure", "src\OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj", "{E6BD7EE7-9677-4D83-A4B8-C9F67686C404}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.ConsoleHttpClient", "OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj", "{0C60DC2B-6D87-465B-BFBE-0A3508E880D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.ConsoleHttpClient", "src\OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj", "{0C60DC2B-6D87-465B-BFBE-0A3508E880D5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Http", "OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj", "{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Http", "src\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj", "{FBDF60FC-D00A-41D3-ABE5-05E4BB507A6D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Grpc", "OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj", "{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Grpc", "src\OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj", "{A9FA201E-8E38-4CB1-B437-5EBD4FBDF15E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.ConsoleGrpcClient", "OzonEdu.MerchandiseService.ConsoleGrpcClient\OzonEdu.MerchandiseService.ConsoleGrpcClient.csproj", "{309DA02F-9918-4134-81BF-470B62DB8F1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.ConsoleGrpcClient", "src\OzonEdu.MerchandiseService.ConsoleGrpcClient\OzonEdu.MerchandiseService.ConsoleGrpcClient.csproj", "{309DA02F-9918-4134-81BF-470B62DB8F1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.Domain", "OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj", "{05FEB838-0E58-48FB-8E85-B0F89DB1E744}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.Domain", "src\OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj", "{05FEB838-0E58-48FB-8E85-B0F89DB1E744}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.Application", "OzonEdu.MerchandiseService.Application\OzonEdu.MerchandiseService.Application.csproj", "{0E8C6FE8-2905-46EE-8128-37609FDE351A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.Application", "src\OzonEdu.MerchandiseService.Application\OzonEdu.MerchandiseService.Application.csproj", "{0E8C6FE8-2905-46EE-8128-37609FDE351A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.DomainTests", "OzonEdu.MerchandiseService.DomainTests\OzonEdu.MerchandiseService.DomainTests.csproj", "{88AB27F8-550B-4B31-BB64-05EF8A265978}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OzonEdu.MerchandiseService.DomainTests", "tests\OzonEdu.MerchandiseService.DomainTests\OzonEdu.MerchandiseService.DomainTests.csproj", "{88AB27F8-550B-4B31-BB64-05EF8A265978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
