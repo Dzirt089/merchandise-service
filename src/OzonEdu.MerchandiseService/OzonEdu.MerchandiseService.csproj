@@ -5,7 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>c7ea3710-a309-42aa-b758-005d63cf5ce8</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<!-- не включать в publish контент из транзитивных (косвенных) ProjectReference -->
     <DockerfileContext>..\..</DockerfileContext>
+	<DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.30.2" />
@@ -16,14 +18,30 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleGrpcClient\OzonEdu.MerchandiseService.ConsoleGrpcClient.csproj" />
-    <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj" />
-    <ProjectReference Include="..\OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj" />
-    <ProjectReference Include="..\OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj" />
-    <ProjectReference Include="..\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj" />
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleGrpcClient\OzonEdu.MerchandiseService.ConsoleGrpcClient.csproj" >
+		  <!-- берём только код и runtime-артефакты, без contentFiles -->
+		  <IncludeAssets>Compile;Runtime</IncludeAssets>
+      </ProjectReference>
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj" >
+		  <IncludeAssets>Compile;Runtime</IncludeAssets>
+	  </ProjectReference>
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj" >
+		  <IncludeAssets>Compile;Runtime</IncludeAssets>
+	  </ProjectReference>
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj" >
+		  <IncludeAssets>Compile;Runtime</IncludeAssets>
+	  </ProjectReference>
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj" >
+		  <IncludeAssets>Compile;Runtime</IncludeAssets>
+	  </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+	<!-- Явное исключение файлов настроек -->
+    <Content Remove="appsettings*.json"/>
   </ItemGroup>
 </Project>
