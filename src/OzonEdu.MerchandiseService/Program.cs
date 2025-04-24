@@ -1,5 +1,5 @@
 using OzonEdu.MerchandiseService.GrpcServices;
-using OzonEdu.MerchandiseService.Infrastructure.Configuration;
+using OzonEdu.MerchandiseService.Infrastructure;
 using OzonEdu.MerchandiseService.Services;
 public class Program
 {
@@ -25,4 +25,5 @@ public class Program
 		app.MapControllers();
 		app.Run();
 	}
+
 }
