@@ -3,7 +3,6 @@
 using OzonEdu.MerchandiseService.Application.Commands.NewMerchandiseAppeared;
 using OzonEdu.MerchandiseService.Application.Contracts;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
-using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Interfaces;
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {

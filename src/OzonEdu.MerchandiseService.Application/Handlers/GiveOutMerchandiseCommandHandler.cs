@@ -3,9 +3,7 @@
 using OzonEdu.MerchandiseService.Application.Commands.GiveOutMerchandise;
 using OzonEdu.MerchandiseService.Application.Contracts;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
-using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Interfaces;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
-using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets.Interfaces;
 using OzonEdu.MerchandiseService.Domain.Root.Exceptions;
 
 namespace OzonEdu.MerchandiseService.Application.Handlers

@@ -3,7 +3,6 @@
 using OzonEdu.MerchandiseService.Application.Models.DTOs;
 using OzonEdu.MerchandiseService.Application.Queries.GetRequestsByEmployee;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
-using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Interfaces;
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {

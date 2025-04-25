@@ -5,9 +5,9 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
 namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.DomainEvents
 {
 	/// <summary>
-	/// Событие, которое возникает при отклонении заявки на выдачу мерча
+	/// Событие, которое возникает при выдаче мерча по запросу
 	/// </summary>
-	public sealed record MerchandiseRequestDeclined : INotification
+	public sealed class MerchandiseRequestGiveOutDomainEvent : INotification
 	{
 		/// <summary>
 		/// Сотрудник, которому выдаем мерч

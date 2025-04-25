@@ -104,7 +104,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 					GiveOutAt = giveOutAt;
 
 					//Бросаем доменное событие, что выдали такой-то набор мерча определенному сотруднику
-					AddDomainEvent(new MerchandiseRequestGiveOut
+					AddDomainEvent(new MerchandiseRequestGiveOutDomainEvent
 					{
 						SkuPreset = SkuPreset,
 						Employee = Employee,
@@ -136,7 +136,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			{
 				Status = MerchandiseRequestStatus.Declined;
 				//Бросаем доменное событие, что отклонили выдачу мерча
-				AddDomainEvent(new MerchandiseRequestDeclined
+				AddDomainEvent(new MerchandiseRequestDeclinedDomainEvent
 				{
 					SkuPreset = SkuPreset,
 					Employee = Employee,

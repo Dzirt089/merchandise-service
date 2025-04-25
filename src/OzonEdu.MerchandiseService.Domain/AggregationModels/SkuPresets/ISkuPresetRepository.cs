@@ -1,6 +1,6 @@
 ﻿using OzonEdu.MerchandiseService.Domain.Contracts;
 
-namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets.Interfaces
+namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 {
 	public interface ISkuPresetRepository : IRepository<SkuPreset>
 	{

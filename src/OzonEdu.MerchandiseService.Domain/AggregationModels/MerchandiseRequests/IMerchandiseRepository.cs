@@ -1,6 +1,6 @@
 ﻿using OzonEdu.MerchandiseService.Domain.Contracts;
 
-namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Interfaces
+namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests
 {
 	public interface IMerchandiseRepository : IRepository<MerchandiseRequest>
 	{

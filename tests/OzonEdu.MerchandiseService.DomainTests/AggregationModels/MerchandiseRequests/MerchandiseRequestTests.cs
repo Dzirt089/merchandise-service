@@ -65,7 +65,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			Assert.Equal(MerchandiseRequestStatus.Done, request.Status);
 			Assert.Equal(giveOutAt, request.GiveOutAt);
 			// Проверяем, что доменное событие о выдаче добавлено.
-			Assert.True(request.DomainEvents.Any(e => e is MerchandiseRequestGiveOut));
+			Assert.True(request.DomainEvents.Any(e => e is MerchandiseRequestGiveOutDomainEvent));
 		}
 
 		[Fact]
@@ -87,7 +87,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			Assert.Equal(MerchandiseRequestStatus.Processing, request.Status);
 			Assert.Null(request.GiveOutAt);
 			// Не должно быть события выдачи, так как мерч не выдан
-			Assert.False(request.DomainEvents.Any(e => e is MerchandiseRequestGiveOut));
+			Assert.False(request.DomainEvents.Any(e => e is MerchandiseRequestGiveOutDomainEvent));
 		}
 
 		[Fact]
@@ -124,7 +124,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			// Assert
 			Assert.Equal(MerchandiseRequestStatus.Declined, request.Status);
 			// Проверяем, что событие Declined добавлено
-			Assert.True(request.DomainEvents.Any(e => e is MerchandiseRequestDeclined));
+			Assert.True(request.DomainEvents.Any(e => e is MerchandiseRequestDeclinedDomainEvent));
 		}
 
 		[Fact]
