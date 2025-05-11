@@ -7,7 +7,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 	/// <summary>
 	/// Событие, которое возникает при выдаче мерча по запросу
 	/// </summary>
-	public sealed class MerchandiseRequestGiveOutDomainEvent : INotification
+	public sealed record MerchandiseRequestGiveOutDomainEvent : INotification
 	{
 		/// <summary>
 		/// Сотрудник, которому выдаем мерч
