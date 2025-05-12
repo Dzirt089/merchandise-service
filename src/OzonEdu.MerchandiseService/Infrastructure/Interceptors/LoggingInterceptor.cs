@@ -15,49 +15,49 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Interceptors
 		/// <summary>
 		/// Логируем обычные gRPC запросы
 		/// </summary>
-		/// <typeparam name="TRequest"></typeparam>
-		/// <typeparam name="TResponse"></typeparam>
-		/// <param name="request"></param>
-		/// <param name="context"></param>
-		/// <param name="continuation"></param>
-		/// <returns></returns>
-		public override Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request,
+		public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request,
 			ServerCallContext context,
 			UnaryServerMethod<TRequest, TResponse> continuation)
 		{
+			// Логирование запроса
 			try
 			{
-				var requestJson = JsonSerializer.Serialize(request);
+				// название метода, который вызывают
+				_logger.LogInformation($"Grpc request {context.Method}");
+
+				// Сериализуем request (Protobuf-сообщение) в JSON.
+				var requestJson = JsonSerializer.Serialize(request, JsonSerializerOptionsFactory.Default);
+
+				//Записываем в лог.
 				_logger.LogInformation(requestJson);
 			}
-			catch (Exception ex)
+			catch (Exception exception)
 			{
-				_logger.LogError(ex, ex.StackTrace);
+				_logger.LogError(exception, "Could not log grpc request");
 			}
 
-			var response = base.UnaryServerHandler(request, context, continuation);
+			// Вызов реального метода в сервисе, то есть метод сервиса, например "/ozon.stockapi.Stock/GetStockById"
+			var response = await base.UnaryServerHandler(request, context, continuation);
+
+			// Логирование ответа
 			try
 			{
-				var responseJson = JsonSerializer.Serialize(response);
+				// Сериализуем response (protobuf-объект) в JSON. Затем логируем его.
+				var responseJson = JsonSerializer.Serialize(response, JsonSerializerOptionsFactory.Default);
 				_logger.LogInformation(responseJson);
 			}
-			catch (Exception ex)
+			catch (Exception exception)
 			{
-				_logger.LogError(ex, ex.StackTrace);
+				_logger.LogError(exception, "Could not log grpc response");
 			}
 
+			// Возвращаем ответ клиенту
 			return response;
 		}
 
 		/// <summary>
 		/// Логгируем стримы. Для сбора статистики, как часто стримы открываются, например.
 		/// </summary>
-		/// <typeparam name="TRequest"></typeparam>
-		/// <typeparam name="TResponse"></typeparam>
-		/// <param name="request"></param>
-		/// <param name="context"></param>
-		/// <param name="continuation"></param>
-		/// <returns></returns>
 		public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(TRequest request,
 			ClientInterceptorContext<TRequest, TResponse> context,
 			AsyncServerStreamingCallContinuation<TRequest, TResponse> continuation)
