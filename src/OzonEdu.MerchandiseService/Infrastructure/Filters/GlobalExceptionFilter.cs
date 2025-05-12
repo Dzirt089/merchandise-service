@@ -6,24 +6,38 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Filters
 	public class GlobalExceptionFilter : ExceptionFilterAttribute
 	{
 		/// <summary>
-		/// Для IExceptionFilter можно переопределить только один метод.
+		/// Обработчик исключений, который возвращает JSON-ответ с информацией об ошибке.
 		/// </summary>
 		/// <param name="context"></param>
+		/// <returns></returns>
 		public override void OnException(ExceptionContext context)
 		{
-			//Создание объекта с подробностями о проблеме, чтобы вернуть его в ответе.
-			var error = new ProblemDetails
-			{
-				Title = "An error occurred",
-				Detail = context.Exception.Message,
-				Status = 500,
-				Type = "https://httpstatuses.com/500"
-			};
-			//Создает ObjectResult для сериализации ProblemDetails и установки кода состояния ответа
-			context.Result = new ObjectResult(error) { StatusCode = 500 };
+			var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
-			//Помечает исключение как обработанное, чтобы предотвратить его распространение в конвейер промежуточного ПО.
-			context.ExceptionHandled = true;
+			var statusCode = context.Exception switch
+			{
+				ArgumentNullException => 400,
+				_ => 500
+			};
+
+			//Создание объекта с подробностями о проблеме, чтобы вернуть его в ответе.
+			var error = new
+			{
+				ExceptionType = context.Exception.GetType().FullName,
+				// Сообщение ошибки (безопасно для прода)
+				Message = isDevelopment ? context.Exception.Message : "Произошла ошибка. Обратитесь в отдел IT",
+
+				// Стектрейс ошибки (безопасно для прода)
+				StackTrace = isDevelopment ? context.Exception.StackTrace : null,
+
+				Status = statusCode
+			};
+
+			var jsonResult = new JsonResult(error)
+			{
+				StatusCode = statusCode
+			};
+			context.Result = jsonResult;
 		}
 	}
 }

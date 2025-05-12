@@ -1,5 +1,6 @@
 using OzonEdu.MerchandiseService.GrpcServices;
 using OzonEdu.MerchandiseService.Infrastructure;
+using OzonEdu.MerchandiseService.Infrastructure.Filters;
 using OzonEdu.MerchandiseService.Services;
 public class Program
 {
@@ -9,20 +10,25 @@ public class Program
 
 		builder.Services.AddEndpointsApiExplorer();
 
-		//Подключаем сервисы библиотеки почти со всеми подключениями (Сваггер, логги, фильтры, контроллер).        
-		builder.Services.AddInfrastructure();
+		//Подключаем сервисы (Сваггер, логги, фильтры, контроллер).        
+		builder.ConfigurePorts();
+		builder.Services.AddInfrastructureSwagger();
+		builder.Services.AddInfrastructureEndpoints();
+		builder.Services.AddInfrastructureLogger();
+		builder.Services.AddInfrastructureMiddlewareGrpc();
+		builder.Services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
+
 		builder.Services.AddSingleton<IMerchService, MerchService>();
 
 		var app = builder.Build();
 
 		//Подключаем миддлеваре библиотеки
-		app.AddInfrastructureMiddleware();
-		app.UseHttpsRedirection();
+		app.AddInfrastructureMiddlewareHttp();
+		//app.UseHttpsRedirection();
 
 		app.UseAuthorization();
 
 		app.MapGrpcService<MerchApiGrpsService>();
-		app.MapControllers();
 		app.Run();
 	}
 
