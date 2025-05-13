@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi.Models;
 
+using OzonEdu.MerchandiseService.Infrastructure.Filters;
 using OzonEdu.MerchandiseService.Infrastructure.Interceptors;
-using OzonEdu.MerchandiseService.Infrastructure.Middlewares;
 using OzonEdu.MerchandiseService.Infrastructure.StartapFilters;
+
+using Serilog;
+using Serilog.Events;
 
 using System.Net;
 using System.Reflection;
@@ -46,20 +49,30 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 			return services;
 		}
 
-		public static IServiceCollection AddInfrastructureLogger(this IServiceCollection services)
+		public static WebApplicationBuilder AddInfrastructureLogger(this WebApplicationBuilder app)
 		{
-			//Добавляю свои настройки для логов 
-			if (_configuration != null)
-			{
-				services.AddLogging(builder =>
+			// Создаем папку для логов, если её нет
+			var logPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+			Directory.CreateDirectory(logPath);
+
+			app.Host.UseSerilog(
+				(context, services, config) =>
 				{
-					builder.ClearProviders();
-					builder.AddConfiguration(_configuration.GetSection("Logging"));
-					builder.AddConsole();
-					builder.AddFile(@"Logs/app-{Date}.txt");
+					// Базовая конфигурация из appsettings.json
+					config.ReadFrom.Configuration(context.Configuration);
+
+					// Кастомные настройки, которые сложно выразить через JSON
+					config.Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName)
+						  .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName);
+
+					// Кастомные приемники, которые сложно описать в JSON
+					if (context.HostingEnvironment.IsDevelopment())
+					{
+						config.WriteTo.Debug();
+					}
 				});
-			}
-			return services;
+
+			return app;
 		}
 
 		/// <summary>
@@ -67,8 +80,45 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 		/// </summary>
 		public static IApplicationBuilder AddInfrastructureMiddlewareHttp(this IApplicationBuilder app)
 		{
-			app.UseMiddleware<RequestLoggingMiddleware>();
-			app.UseMiddleware<ResponseLoggingMiddleware>();
+			app.UseSerilogRequestLogging(opts =>
+			{
+				// Опционально: кастомизируем шаблон сообщения
+				opts.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+				opts.GetLevel = (httpContext, elapsed, ex) =>
+				{
+					if (ex != null || httpContext.Response.StatusCode >= 500)
+						return LogEventLevel.Error;
+					if (httpContext.Response.StatusCode >= 400)
+						return LogEventLevel.Warning;
+					return LogEventLevel.Information;
+				};
+
+				opts.EnrichDiagnosticContext = (IDiagnosticContext diagnosticContext, HttpContext httpContext) =>
+				{
+					// **Вот здесь** пытаемся взять детали ошибки, если они туда были положены
+					if (httpContext.Items.TryGetValue("ErrorDetails", out var ed) && ed is GlobalErrorDetails globalError)
+					{
+						diagnosticContext.Set("ExceptionType", globalError.ExceptionType ?? string.Empty);
+						diagnosticContext.Set("ExceptionMessage", globalError.Message);
+						diagnosticContext.Set("ExceptionStackTrace", globalError.StackTrace ?? string.Empty);
+						diagnosticContext.Set("ExceptionStatus", globalError.Status);
+					}
+					diagnosticContext.Set("TraceId", httpContext.TraceIdentifier);
+					diagnosticContext.Set("ConnectionId", httpContext.Connection.Id);
+					diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
+					diagnosticContext.Set("ResponseStatusCode", httpContext.Response.StatusCode);
+					diagnosticContext.Set("RequestPath", httpContext.Request.Path);
+					diagnosticContext.Set("RequestQueryString", httpContext.Request.QueryString);
+					diagnosticContext.Set("RequestContentType", httpContext.Request.ContentType ?? string.Empty);
+					diagnosticContext.Set("RequestContentLength", httpContext.Request.ContentLength ?? 0);
+					diagnosticContext.Set("RequestHeaders", httpContext.Request.Headers.ToString() ?? string.Empty);
+					diagnosticContext.Set("ResponseHeaders", httpContext.Response.Headers.ToString() ?? string.Empty);
+					diagnosticContext.Set("RequestHost", httpContext.Request.Host);
+					diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+					diagnosticContext.Set("RequestProtocol", httpContext.Request.Protocol);
+				};
+			});
 			app.UseRouting();
 			app.UseEndpoints(endpoints => endpoints.MapControllers());
 			return app;
