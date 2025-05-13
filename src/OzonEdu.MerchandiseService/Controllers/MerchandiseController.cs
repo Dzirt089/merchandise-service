@@ -8,9 +8,16 @@ namespace OzonEdu.MerchandiseService.Controllers
 
 	[Route("[controller]")]
 	[ApiController]
-	public class MerchandiseController(IMerchService merch) : ControllerBase
+	public class MerchandiseController : ControllerBase
 	{
-		private readonly IMerchService _merchService = merch;
+		private readonly IMerchService _merchService;
+		private readonly ILogger<MerchandiseController> _logger;
+
+		public MerchandiseController(IMerchService merch, ILogger<MerchandiseController> logger)
+		{
+			_merchService = merch;
+			_logger = logger;
+		}
 
 		/// <summary>
 		/// Получаем все данные со склада по всему мерчу
@@ -20,10 +27,19 @@ namespace OzonEdu.MerchandiseService.Controllers
 		[HttpGet("[action]")]
 		public async Task<ActionResult<List<ItemPosition>>> GetAllMerch(CancellationToken token)
 		{
+			throw new NotImplementedException();
 			var result = await _merchService.GetAll(token);
 			List<ItemPosition> items = new List<ItemPosition>();
 			foreach (var item in result)
 			{
+				_logger.LogInformation("New ItemPosition = {@ItemPosition}",
+					new ItemPosition
+					{
+						IdPosition = item.Id,
+						ItemNamePosition = item.ItemName,
+						QuantityPosition = item.Quantity
+					});
+
 				items.Add(new ItemPosition
 				{
 					IdPosition = item.Id,
