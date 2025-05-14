@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi.Models;
 
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 using OzonEdu.MerchandiseService.Infrastructure.Filters;
 using OzonEdu.MerchandiseService.Infrastructure.Interceptors;
 using OzonEdu.MerchandiseService.Infrastructure.StartapFilters;
@@ -8,19 +12,15 @@ using OzonEdu.MerchandiseService.Infrastructure.StartapFilters;
 using Serilog;
 using Serilog.Events;
 
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+
 
 namespace OzonEdu.MerchandiseService.Infrastructure
 {
 	public static class HostBuilderExtensions
 	{
-		//Создаю кофигурацию, чтобы библиотечке считать данные с неё
-		static IConfigurationRoot? _configuration = new ConfigurationBuilder()
-			.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile("appsettings.json")
-			.Build();
-
 		/// <summary>
 		/// Подключаем Swagger сервис
 		/// </summary>
@@ -39,16 +39,25 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 
 			services.AddSingleton<IStartupFilter, TerminalStartupFilter>();
 
-
 			return services;
 		}
 
+		/// <summary>
+		/// Подключаем сервис с конечными точками (/ready; /live; /version)
+		/// </summary>
+		/// <param name="services"></param>
+		/// <returns></returns>
 		public static IServiceCollection AddInfrastructureEndpoints(this IServiceCollection services)
 		{
 			services.AddSingleton<IStartupFilter, TerminalStartupFilter>();
 			return services;
 		}
 
+		/// <summary>
+		/// Подключаем Serilog для логгирования приложения.
+		/// </summary>
+		/// <param name="app"></param>
+		/// <returns></returns>
 		public static WebApplicationBuilder AddInfrastructureLogger(this WebApplicationBuilder app)
 		{
 			// Создаем папку для логов, если её нет
@@ -74,7 +83,43 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 
 			return app;
 		}
+		public static WebApplicationBuilder AddInfrastructureOpenTelemetry(this WebApplicationBuilder app)
+		{
+			app.Services.AddOpenTelemetry()
+			.ConfigureResource(res => res
+				.AddService(
+					serviceName: app.Environment.ApplicationName,
+					serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "no version",
+					serviceInstanceId: Environment.MachineName))
+			.WithTracing(tb =>
+			{
+				tb
+					.AddAspNetCoreInstrumentation(opt =>
+						opt.Filter = x =>
+							!x.Request.Path.StartsWithSegments("/health"))    // Автоматически работает с HTTP и gRPC сервером
 
+					.AddHttpClientInstrumentation()
+					.AddGrpcClientInstrumentation()  // Для gRPC клиента
+					.AddEntityFrameworkCoreInstrumentation() // Для EF Core
+					.AddSqlClientInstrumentation()    // Для Dapper (и любого ADO.NET провайдера)
+													  //.AddSource("OzonEdu.MerchandiseService")
+					.AddConsoleExporter()
+					.AddJaegerExporter(o =>
+					{
+						o.AgentHost = "localhost"; // адрес Jaeger-агента
+						o.AgentPort = 6831;        // порт Jaeger-агента (UDP)
+						o.Protocol = JaegerExportProtocol.HttpBinaryThrift;
+						o.Endpoint = new Uri("http://localhost:14268/api/traces"); // порт HTTP-коллектора Jaeger
+					});
+			});
+
+			var activitySource = new ActivitySource("OzonEdu.MerchandiseService");
+			using var activity = activitySource.StartActivity("ManualTestSpan");
+			activity?.SetTag("custom.tag", "hello_jaeger");
+			activity?.SetStatus(ActivityStatusCode.Ok);
+
+			return app;
+		}
 		/// <summary>
 		/// Подключаем для логгирования Http запросов и ответов, роутинг, конечные точки контроллеров.   
 		/// </summary>
@@ -133,6 +178,11 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 			return services;
 		}
 
+		/// <summary>
+		/// Настраиваем порты для приложения.
+		/// </summary>
+		/// <param name="builder"></param>
+		/// <returns></returns>
 		public static WebApplicationBuilder ConfigurePorts(this WebApplicationBuilder builder)
 		{
 			var httpPortEnv = Environment.GetEnvironmentVariable("HTTP_PORT");
@@ -151,6 +201,13 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 
 			return builder;
 		}
+
+		/// <summary>
+		/// Настраивает сервер Kestrel на прослушивание на указанном порту с использованием заданных протоколов.
+		/// </summary>
+		/// <param name="kestrelServerOptions"></param>
+		/// <param name="port"></param>
+		/// <param name="protocols"></param>
 		static void Listen(KestrelServerOptions kestrelServerOptions, int? port, HttpProtocols protocols)
 		{
 			if (port == null)

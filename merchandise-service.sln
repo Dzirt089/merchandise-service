@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D606625A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8DCAAB3D-4F2C-46B1-8F13-5E9F08AC03F0}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
 		Readme.md = Readme.md
 	EndProjectSection
