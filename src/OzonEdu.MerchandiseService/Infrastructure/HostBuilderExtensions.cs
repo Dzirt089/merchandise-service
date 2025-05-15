@@ -187,11 +187,11 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 		{
 			var httpPortEnv = Environment.GetEnvironmentVariable("HTTP_PORT");
 			if (!int.TryParse(httpPortEnv, out var httpPort))
-				httpPort = 5000;
+				httpPort = 5006;
 
 			var grpcPortEnv = Environment.GetEnvironmentVariable("GRPC_PORT");
 			if (!int.TryParse(grpcPortEnv, out var grpcPort))
-				grpcPort = 5002;
+				grpcPort = 5008;
 
 			builder.WebHost.ConfigureKestrel(options =>
 			{
