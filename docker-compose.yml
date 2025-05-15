@@ -1,23 +1,23 @@
 services:
-  merchandise-services:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - "5080:5006"
-      - "5082:5008" 
-    depends_on:
-      merchandise-services-db:
-        condition: service_healthy
-    environment:
-      DatabaseConnectionOptions__ConnectionString: >
-        Host=merchandise-services-db;
-        Port=5432;
-        Database=merchandise-services;
-        Username=postgres;
-        Password=merchandiseServicesPassword
-    networks:
-      - merch-network
+  # merchandise-services:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   ports:
+  #     - "5080:5006"
+  #     - "5082:5008" 
+  #   depends_on:
+  #     merchandise-services-db:
+  #       condition: service_healthy
+  #   environment:
+  #     DatabaseConnectionOptions__ConnectionString: >
+  #       Host=merchandise-services-db;
+  #       Port=5432;
+  #       Database=merchandise-services;
+  #       Username=postgres;
+  #       Password=merchandiseServicesPassword
+  #   networks:
+  #     - merch-network
     #restart: unless-stopped
       
   merchandise-services-db:
@@ -40,6 +40,14 @@ services:
     restart: unless-stopped
     networks:
       - merch-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
 
   redis:
     image: redis
@@ -52,6 +60,14 @@ services:
       - merch-network
     hostname: redis
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
 
   elasticsearch:
     image: elastic/elasticsearch:7.17.17
@@ -74,6 +90,14 @@ services:
     restart: unless-stopped
     networks:
       - merch-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+        reservations:
+          cpus: "1.0"
+          memory: 2G
 
   kibana:
     image: elastic/kibana:7.17.17
@@ -87,6 +111,14 @@ services:
         condition: service_healthy
     networks:
       - merch-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     #restart: unless-stopped
 
   jaeger:
@@ -99,6 +131,14 @@ services:
       - COLLECTOR_OTLP_ENABLED=true  # если нужен OTLP
     networks:
       - merch-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
     #restart: unless-stopped
 
 networks:
