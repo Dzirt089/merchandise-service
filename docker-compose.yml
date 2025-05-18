@@ -1,29 +1,31 @@
 services:
-  # merchandise-services:
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile
-  #   ports:
-  #     - "5080:5006"
-  #     - "5082:5008" 
-  #   depends_on:
-  #     merchandise-services-db:
-  #       condition: service_healthy
-  #   environment:
-  #     DatabaseConnectionOptions__ConnectionString: >
-  #       Host=merchandise-services-db;
-  #       Port=5432;
-  #       Database=merchandise-services;
-  #       Username=postgres;
-  #       Password=merchandiseServicesPassword
-  #   networks:
-  #     - merch-network
-    #restart: unless-stopped
+  merchandise-services:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      -  "8080:80"  
+      - "5080:5006"
+      - "5082:5008" 
+    depends_on:
+      merchandise-services-db:
+        condition: service_healthy
+    environment:
+      StockApiGrpcServiceConfiguration__ServerAddress: "http://stock-api:82"    
+      DatabaseConnectionOptions__ConnectionString: >
+        Host=merchandise-services-db;
+        Port=5432;
+        Database=merchandise-services;
+        Username=postgres;
+        Password=merchandiseServicesPassword
+    networks:
+      - merch-network  
+    restart: unless-stopped
       
   merchandise-services-db:
     image: postgres:latest
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    #volumes:
+     # - pgdata:/var/lib/postgresql/data
      # - ./pg_data:/var/lib/postgresql/data
     ports:
       - "5436:5432"
@@ -146,7 +148,7 @@ networks:
     driver: bridge    
 
 volumes:
-  pgdata:
+ # pgdata:
   redisdata:  
   esdata:  
   

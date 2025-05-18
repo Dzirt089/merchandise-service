@@ -22,6 +22,7 @@ RUN dotnet build "OzonEdu.MerchandiseService.csproj" -c Release -o /app/build
 # Публикуем из образа билд в publish. Так сказать ренейминг. В новую папку publish
 FROM build AS publish
 RUN dotnet publish "OzonEdu.MerchandiseService.csproj" -c Release -o /app/publish
+COPY "entrypoint.sh" "/app/publish/."
 
 # Берем новый образ .Net для запуска в нём нашего приложения. 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS runtime
@@ -31,6 +32,7 @@ WORKDIR /app
 
 # Какие порты будут выводить
 EXPOSE 80
+EXPOSE 443
 
 # Делаем финальный образ на базе runtime
 FROM runtime AS final
@@ -42,4 +44,10 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Точка, из которой контейнер будет исполняться
-ENTRYPOINT ["dotnet","OzonEdu.MerchandiseService.dll"]
+#ENTRYPOINT ["dotnet","OzonEdu.MerchandiseService.dll"]
+
+# даём права
+RUN chmod +x entrypoint.sh
+
+# Запуск скрипта напрямую (JSON-массив для корректной обработки сигналов)
+CMD ["/bin/bash", "entrypoint.sh"]

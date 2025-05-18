@@ -1,13 +1,20 @@
-﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
+﻿using Grpc.Net.Client;
+
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
+using OzonEdu.MerchandiseService.Application.Contracts;
+using OzonEdu.MerchandiseService.DataAccess.EntityFramework.Configurations;
+using OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts;
 using OzonEdu.MerchandiseService.Infrastructure.Filters;
 using OzonEdu.MerchandiseService.Infrastructure.Interceptors;
 using OzonEdu.MerchandiseService.Infrastructure.StartapFilters;
+using OzonEdu.StockApi.Grpc;
 
 using Serilog;
 using Serilog.Events;
@@ -21,6 +28,29 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 {
 	public static class HostBuilderExtensions
 	{
+		public static IServiceCollection AddStockGrpcServiceClient(this IServiceCollection services, IConfiguration configuration)
+		{
+			var connectionAddres = configuration
+				.GetSection(nameof(StockApiGrpcServiceConfiguration))
+				.Get<StockApiGrpcServiceConfiguration>()
+				.ServerAddress;
+
+			if (string.IsNullOrWhiteSpace(connectionAddres))
+			{
+				connectionAddres = configuration
+					.Get<StockApiGrpcServiceConfiguration>()
+					.ServerAddress;
+			}
+
+			services.AddScoped<StockApiGrpc.StockApiGrpcClient>(provider =>
+			{
+				var channel = GrpcChannel.ForAddress(connectionAddres);
+				return new StockApiGrpc.StockApiGrpcClient(channel);
+			});
+
+			return services;
+		}
+
 		/// <summary>
 		/// Подключаем Swagger сервис
 		/// </summary>
@@ -83,6 +113,12 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 
 			return app;
 		}
+
+		/// <summary>
+		/// Добавляем OpenTelemetry для трассировки и экспорта в Jaeger.
+		/// </summary>
+		/// <param name="app"></param>
+		/// <returns></returns>
 		public static WebApplicationBuilder AddInfrastructureOpenTelemetry(this WebApplicationBuilder app)
 		{
 			app.Services.AddOpenTelemetry()
@@ -120,6 +156,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 
 			return app;
 		}
+
 		/// <summary>
 		/// Подключаем для логгирования Http запросов и ответов, роутинг, конечные точки контроллеров.   
 		/// </summary>
@@ -179,6 +216,19 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 		}
 
 		/// <summary>
+		/// Добавление EntityFrameworkDb для работы с БД.
+		/// </summary>
+		public static IServiceCollection AddMerchandiseServicesEntityFrameworkDb(this IServiceCollection services, IConfiguration configuration)
+		{
+			var dbConfigSection = configuration.GetSection("DatabaseConnectionOptions");
+			var dbConfig = dbConfigSection.Get<DbConfiguration>();
+
+			services.Configure<DbConfiguration>(configuration);
+			services.AddDbContext<MerchandiseDbContext>(opt => { opt.UseNpgsql(dbConfig.ConnectionString); });
+			return services;
+		}
+
+		/// <summary>
 		/// Настраиваем порты для приложения.
 		/// </summary>
 		/// <param name="builder"></param>
@@ -193,6 +243,12 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 			if (!int.TryParse(grpcPortEnv, out var grpcPort))
 				grpcPort = 5008;
 
+			if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+			{
+				httpPort = 80;
+				grpcPort = 82;
+			}
+
 			builder.WebHost.ConfigureKestrel(options =>
 			{
 				Listen(options, httpPort, HttpProtocols.Http1);
@@ -205,16 +261,15 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 		/// <summary>
 		/// Настраивает сервер Kestrel на прослушивание на указанном порту с использованием заданных протоколов.
 		/// </summary>
-		/// <param name="kestrelServerOptions"></param>
-		/// <param name="port"></param>
-		/// <param name="protocols"></param>
+		/// <param name="kestrelServerOptions">Параметры конфигурации сервера Kestrel.</param>
+		/// <param name="port">Порт, на котором будет прослушиваться сервер.</param>
+		/// <param name="protocols">Протоколы, которые будут использоваться для соединения.</param>
 		static void Listen(KestrelServerOptions kestrelServerOptions, int? port, HttpProtocols protocols)
 		{
 			if (port == null)
 				return;
 
 			var address = IPAddress.Any;
-
 
 			kestrelServerOptions.Listen(address, port.Value, listenOptions => { listenOptions.Protocols = protocols; });
 		}
