@@ -2,6 +2,5 @@
 {
 	public interface IRepository<TAggregationRoot>
 	{
-		IUnitOfWork UnitOfWork { get; }
 	}
 }

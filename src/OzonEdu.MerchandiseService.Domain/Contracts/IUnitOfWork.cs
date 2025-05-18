@@ -2,13 +2,16 @@
 {
 	public interface IUnitOfWork
 	{
-		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+		/// <summary>
+		/// Initiates a transaction encompassing all actions (Repositories, Events).
+		/// </summary>
+		ValueTask StartTransactionAsync(CancellationToken cancellationToken);
 
 		/// <summary>
-		/// Комитим все изменения
+		/// Commits all changes made during the transaction.
 		/// </summary>
-		/// <param name="cancellationToken"></param>
-		/// <returns></returns>
-		Task<int> SaveEntitiesAsync(CancellationToken cancellationToken = default);
+		/// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+		/// <returns>A task that represents the asynchronous save operation.</returns>
+		Task SaveChangesAsync(CancellationToken cancellationToken);
 	}
 }

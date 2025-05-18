@@ -11,15 +11,22 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.31.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.72.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Grpc.Tools" Version="2.72.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5"/>
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="OpenTelemetry" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.6.0-rc.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.12.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.12.0-beta.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
@@ -28,10 +35,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
   <ItemGroup>
+	  <ProjectReference Include="..\OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj" />
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Application\OzonEdu.MerchandiseService.Application.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleGrpcClient\OzonEdu.MerchandiseService.ConsoleGrpcClient.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj" />
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.DataAccess.EntityFramework\OzonEdu.MerchandiseService.DataAccess.EntityFramework.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj" />
+	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Migrator\OzonEdu.MerchandiseService.Migrator.csproj" />
   </ItemGroup>
 </Project>

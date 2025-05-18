@@ -12,11 +12,11 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <summary>
 		/// Сотрудник, которому выдаем мерч
 		/// </summary>
-		public Employee Employee { get; set; }
+		public Employee Employee { get; init; }
 
 		/// <summary>
 		/// Набор мерча, который выдаем сотруднику
 		/// </summary>
-		public SkuPreset SkuPreset { get; set; }
+		public SkuPreset SkuPreset { get; init; }
 	}
 }

@@ -27,7 +27,6 @@ namespace OzonEdu.MerchandiseService.Controllers
 		[HttpGet("[action]")]
 		public async Task<ActionResult<List<ItemPosition>>> GetAllMerch(CancellationToken token)
 		{
-			throw new NotImplementedException();
 			var result = await _merchService.GetAll(token);
 			List<ItemPosition> items = new List<ItemPosition>();
 			foreach (var item in result)
