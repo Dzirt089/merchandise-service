@@ -6,7 +6,7 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Protobuf Include="merch-api.proto" GrpServices="Both" />
+    <Protobuf Include="merchandise-service.proto" GrpServices="Both" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.31.0" />

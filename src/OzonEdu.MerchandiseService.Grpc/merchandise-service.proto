@@ -1,0 +1,41 @@
+﻿syntax = "proto3";
+option csharp_namespace = "OzonEdu.MerchandiseService.Grpc";
+package MerchandiseService;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service MerchandiseServiceGrpc {
+	rpc GiveOutMerchandise(GiveOutMerchandiseRequest) returns (GiveOutMerchandiseResponse);
+	rpc GetRequestsByEmployee(GetRequestsByEmployeeRequest) returns (GetRequestsByEmployeeResponse);
+}
+
+message GiveOutMerchandiseRequest{
+	GiveOutMerchandiseRequestUnit merch_request_unit = 1;
+}
+message GiveOutMerchandiseRequestUnit
+{
+	string email = 1;
+	string clothing_size = 2;
+	string type = 3;
+}
+
+message GiveOutMerchandiseResponse{
+	bool response_check = 1;
+}
+
+
+message GetRequestsByEmployeeRequest{
+	string email = 1;
+}
+
+message GetRequestsByEmployeeResponse{
+	repeated GetRequestsByEmployeeResponseUnit requests = 1;
+}
+
+message GetRequestsByEmployeeResponseUnit{
+	string type = 1;
+	string status = 2;
+	google.protobuf.Timestamp created_at = 3;
+	google.protobuf.Timestamp give_out_at = 4;
+}

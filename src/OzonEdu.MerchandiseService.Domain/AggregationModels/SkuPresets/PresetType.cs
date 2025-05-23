@@ -41,13 +41,13 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 		/// <param name="name"></param>
 		/// <returns></returns>
 		/// <exception cref="DomainException"></exception>
-		public static PresetType Parse(string name) => name?.ToUpper() switch
+		public static PresetType Parse(string name) => name?.ToLower() switch
 		{
-			"Welcome_pack" => WelcomePack,
-			"Conference_listener_pack" => ConferenceListenerPack,
-			"Conference_speaker_pack" => ConferenceSpeakerPack,
-			"Probation_period_ending_pack" => ProbationPeriodEndingPack,
-			"Veteran_pack" => VeteranPack,
+			"welcome_pack" => WelcomePack,
+			"conference_listener_pack" => ConferenceListenerPack,
+			"conference_speaker_pack" => ConferenceSpeakerPack,
+			"probation_period_ending_pack" => ProbationPeriodEndingPack,
+			"veteran_pack" => VeteranPack,
 			_ => throw new DomainException("Unknown preset type name")
 		};
 
