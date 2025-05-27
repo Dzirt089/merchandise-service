@@ -4,35 +4,21 @@ services:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - "8080:80"  
-      - "5081:5006"
-      - "5083:5008" 
-    depends_on:  
+      -  "8080:80"  
+      - "5060:5006"
+      - "5062:5008" 
+    depends_on:
+      jaeger:
+        condition: service_started
       merchandise-services-db:
         condition: service_healthy
-      zookeeper:
-        condition: service_healthy
-      broker:
-        condition: service_healthy
-      jaeger:
-        condition: service_healthy
-      supply-service-api:
-        condition: service_healthy
-      emailing-service:
-        condition: service_healthy
-      employees-service:
-        condition: service_healthy
-      stock-api:
-        condition: service_healthy
-      redis:
+      elasticsearch:
         condition: service_healthy
     environment:
-      BootstrapServers: "broker:29092"
-      topic: "email_notification_event"
-      groupId: "merchandise_service"
-      StockApiGrpcServiceConfiguration__ServerAddress: "http://stock-api:82"
-      JaegerConfiguration__AgentHost: "jaeger"
-      JaegerConfiguration__AgentPort: "6831"    
+      OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger
+      OTEL_EXPORTER_JAEGER_AGENT_PORT: "6831"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      StockApiGrpcServiceConfiguration__ServerAddress: "http://stock-api:82"    
       DatabaseConnectionOptions__ConnectionString: >
         Host=merchandise-services-db;
         Port=5432;
@@ -47,6 +33,7 @@ services:
     image: postgres:latest
     volumes:
       - pgdata:/var/lib/postgresql/data
+     # - ./pg_data:/var/lib/postgresql/data
     ports:
       - "5436:5432"
     environment:
@@ -71,243 +58,11 @@ services:
           cpus: "0.5"
           memory: 512M
 
-  supply-service-api:
-    image: ghcr.io/dzirt089/supply-service:master
-    ports:
-      - "5080:5080"
-      - "5082:5082"
-    environment:
-      DbConfiguration__ConnectionString: "Host=supply-service-db;Port=5432;Database=supply-service;Username=postgres;Password=supplyServicePassword"
-      KafkaConfiguration__BootstrapServers: "broker:29092"
-    networks:
-      - merch-network
-    depends_on:
-      supply-service-db:
-        condition: service_healthy
-      zookeeper:
-        condition: service_healthy
-      broker:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5080/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  emailing-service:
-    image: ghcr.io/dzirt089/emailing-service:master
-    ports:
-      - "8555:80"
-    environment:
-      KafkaTopics__EmployeeNotificationEventTopic: "employee_notification_event"
-    depends_on:
-      zookeeper:
-        condition: service_healthy
-      broker:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - emailing-service:/src
-    networks:
-      - merch-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  employees-service:    
-    image: ghcr.io/dzirt089/employees-service:master
-    ports:
-      - "8443:80"
-    environment:
-      ConnectionString: "Host=employees-service-postgres-db;Port=5432;Database=employees-service;Username=postgres;Password=employeeServicePassword;"
-      BootstrapServers: "broker:29092"
-      Topic: "employee_notification_event"
-    networks:
-      - merch-network
-    depends_on:
-      employees-service-postgres-db:
-        condition: service_healthy
-      zookeeper:
-        condition: service_healthy
-      broker:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - employees-service:/src
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  stock-api:
-    image: ghcr.io/dzirt089/ozonedu.stockapi:master
-    ports:
-      - "5070:80"
-      - "5072:82"
-    networks:
-      - merch-network  
-    environment:
-      DatabaseConnectionOptions__ConnectionString: "Host=stock-api-db;Port=5432;Database=stock-api;Username=postgres;Password=stockApiPassword"
-      BootstrapServers: "broker:29092"
-      topic: "stock_replenished_event"
-      groupId: "stock-api-service"
-      SupplyApiGrpcServiceConfiguration__ServerAddress: "http://supply-service-api:5082"
-    depends_on:
-      stock-api-db:
-        condition: service_healthy
-      supply-service-api:
-        condition: service_healthy
-      zookeeper:
-        condition: service_healthy
-      broker:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  supply-service-db:
-    image: postgres:latest
-    ports:
-      - "5427:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: supplyServicePassword
-      POSTGRES_DB: supply-service
-    command: "-c log_statement=all"
-    networks:
-      - merch-network
-    volumes:
-      - supply-service-db:/var/lib/postgresql/data   
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 512M
-      
-  employees-service-postgres-db:
-    image: postgres:latest
-    ports:
-      - "5425:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: employeeServicePassword
-      POSTGRES_DB: employees-service
-    volumes:
-      - employees-service-postgres-db:/var/lib/postgresql/data
-    command: "-c log_statement=all"     
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - merch-network
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 512M
-
-  stock-api-db:
-    image: postgres:latest
-    ports:
-      - "5426:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: stockApiPassword
-      POSTGRES_DB: stock-api
-    command: "-c log_statement=all"
-    networks:
-      - merch-network  
-    volumes:
-      - stock-api-db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 512M
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
-    hostname: zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - merch-network
-    healthcheck:
-      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  broker:
-    image: confluentinc/cp-kafka:6.2.0
-    container_name: broker
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://broker:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-    healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - merch-network
-    restart: unless-stopped
-
-
   redis:
     image: redis
     volumes:
       - redisdata:/data 
+     # - ./redis_data:/data
     ports:
       - "6379:6379"
     networks:
@@ -322,11 +77,6 @@ services:
         reservations:
           cpus: "0.25"
           memory: 128M
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
   elasticsearch:
     image: elastic/elasticsearch:7.17.17
@@ -399,11 +149,6 @@ services:
           cpus: "0.25"
           memory: 128M
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:14268/api/services || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
 networks:
   merch-network:
@@ -411,12 +156,7 @@ networks:
 
 volumes:
   pgdata:
-  redisdata:
-  esdata:
-  emailing-service:
-  employees-service:
-  supply-service-db:
-  employees-service-postgres-db:
-  stock-api-db:
+  redisdata:  
+  esdata:  
   
     

@@ -142,10 +142,18 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 					.AddConsoleExporter()
 					.AddJaegerExporter(o =>
 					{
-						o.AgentHost = "localhost"; // адрес Jaeger-агента
-						o.AgentPort = 6831;        // порт Jaeger-агента (UDP)
+						// Считаем из переменных окружения, или берём дефолтные
+						o.AgentHost = Environment.GetEnvironmentVariable("OTEL_EXPORTER_JAEGER_AGENT_HOST") ?? "jaeger";
+						o.AgentPort = int.Parse(Environment.GetEnvironmentVariable("OTEL_EXPORTER_JAEGER_AGENT_PORT") ?? "6831");
+						var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_JAEGER_ENDPOINT");
+						if (!string.IsNullOrEmpty(endpoint))
+							o.Endpoint = new Uri(endpoint);
 						o.Protocol = JaegerExportProtocol.HttpBinaryThrift;
-						o.Endpoint = new Uri("http://localhost:14268/api/traces"); // порт HTTP-коллектора Jaeger
+
+						//o.AgentHost = "localhost"; // адрес Jaeger-агента
+						//o.AgentPort = 6831;        // порт Jaeger-агента (UDP)
+						//o.Protocol = JaegerExportProtocol.HttpBinaryThrift;
+						//o.Endpoint = new Uri("http://localhost:14268/api/traces"); // порт HTTP-коллектора Jaeger
 					});
 			});
 
