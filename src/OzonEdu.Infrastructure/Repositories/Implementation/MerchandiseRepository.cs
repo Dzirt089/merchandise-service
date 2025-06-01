@@ -1,4 +1,6 @@
-﻿using OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts;
+﻿using Microsoft.EntityFrameworkCore;
+
+using OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 
 namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
@@ -23,9 +25,13 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 			throw new NotImplementedException();
 		}
 
-		public Task<IReadOnlyCollection<MerchandiseRequest>> GetByEmployeeEmailAsync(Email email, CancellationToken cancellationToken)
+		public async Task<IReadOnlyCollection<MerchandiseRequest>> GetByEmployeeEmailAsync(Email email, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			var result = await _context.MerchandiseRequests
+				.Where(x => x.Employee.Email == email)
+				.ToListAsync(cancellationToken);
+
+			return result;
 		}
 
 		public Task<MerchandiseRequest> GetByIdAsync(long id, CancellationToken cancellationToken)

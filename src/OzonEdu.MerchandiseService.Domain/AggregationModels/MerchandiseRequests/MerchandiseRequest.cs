@@ -164,6 +164,8 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			//Например, сотрудник проработал меньше срока, положенного на выдаваемый набор мерча.
 			//Или повторно пытаемся что-то выдать
 
+
+
 			return true;
 		}
 	}

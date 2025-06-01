@@ -22,14 +22,14 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.Model
 				   .HasColumnName("sku_preset_id")
 				   .IsRequired();
 
-			builder.Property<string>("_employeeEmail")
-				   .HasColumnName("employee_email")
-				   .IsRequired()
-				   .HasMaxLength(255);
+			//builder.Property<string>("_employeeEmail")
+			//	   .HasColumnName("employee_email")
+			//	   .IsRequired()
+			//	   .HasMaxLength(255);
 
-			builder.Property<string>("_clothingSize")
-				   .HasColumnName("clothing_size")
-				   .IsRequired(false);
+			//builder.Property<string>("_clothingSize")
+			//	   .HasColumnName("clothing_size")
+			//	   .IsRequired(false);
 
 			// Проперти для статуса через ValueConverter
 			builder.Property(r => r.Status)
@@ -65,31 +65,13 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.Model
 				  .IsRequired()
 				  .HasMaxLength(255);
 
-				// ClothingSize как owned внутри Employee
-				eb.OwnsOne(e => e.ClothingSize, cb =>
-				{
-					cb.WithOwner();
-
-					cb.Property(c => c.Id)
-					  .HasColumnName("clothing_size_id")
-					  .IsRequired();
-
-					cb.Property(c => c.Name)
-					  .HasColumnName("clothing_size_name")
-					  .HasMaxLength(10)
-					  .IsRequired();
-
-					cb.Property(c => c.Description)
-					  .HasColumnName("clothing_size_description")
-					  .HasMaxLength(100)
-					  .IsRequired(false);
-
-					// Говорим EF: использовать свойства, а не конструктор
-					cb.UsePropertyAccessMode(PropertyAccessMode.PreferProperty);
-				});
-
-				eb.Navigation(e => e.ClothingSize)
-				  .UsePropertyAccessMode(PropertyAccessMode.PreferProperty);
+				eb.Property(e => e.ClothingSize)
+					.HasColumnName("clothing_size")
+					.HasConversion(
+						vo => vo.Name,
+						str => ClothingSize.Parse(str))
+					.IsRequired()
+					.HasMaxLength(255);
 			});
 		}
 	}
