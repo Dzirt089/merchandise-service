@@ -20,6 +20,8 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// </summary>
 		public string Description { get; }
 
+		private ClothingSize() { }
+
 		/// <summary>
 		/// Конструктор ClothingSize (размер одежды)
 		/// </summary>
@@ -28,6 +30,8 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <param name="description"></param>
 		public ClothingSize(int id, string name, string description) : base(id, name)
 			=> Description = description;
+
+
 
 		/// <summary>
 		/// Метод парсинга строки в ClothingSize (размер одежды)

@@ -1,4 +1,5 @@
-﻿using OzonEdu.MerchandiseService.Domain.Contracts;
+﻿using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
+using OzonEdu.MerchandiseService.Domain.Contracts;
 
 namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 {
@@ -26,6 +27,6 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 		/// <param name="type"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
-		Task<SkuPreset> FindByTypeAsync(PresetType type, CancellationToken cancellationToken);
+		Task<SkuPreset> FindByTypeAsync(PresetType type, ClothingSize clothingSize, CancellationToken cancellationToken);
 	}
 }

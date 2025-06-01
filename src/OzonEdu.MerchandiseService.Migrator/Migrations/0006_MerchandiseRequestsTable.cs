@@ -2,7 +2,7 @@
 
 namespace OzonEdu.MerchandiseService.Migrator.Migrations
 {
-	[Migration(2)]
+	[Migration(6)]
 	public class MerchandiseRequestsTable : Migration
 	{
 		public override void Up()
@@ -12,7 +12,7 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
 				Create.Table(CommonConstants.MerchandiseRequestsTable)
 					.WithColumn("Id").AsInt64().PrimaryKey().Identity()
 					.WithColumn("sku_preset_id").AsInt64().NotNullable()
-					.WithColumn("status_id").AsInt32().NotNullable()
+					.WithColumn("merchandise_request_status_id").AsInt32().NotNullable()
 					.WithColumn("created_at").AsDateTimeOffset().NotNullable()
 					.WithDefaultValue(SystemMethods.CurrentUTCDateTime)
 					.WithColumn("give_out_at").AsDateTimeOffset().Nullable()

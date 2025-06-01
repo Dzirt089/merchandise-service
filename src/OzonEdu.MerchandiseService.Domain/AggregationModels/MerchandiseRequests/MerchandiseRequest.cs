@@ -7,6 +7,9 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 {
 	public sealed class MerchandiseRequest : Entity
 	{
+		// Пустой конструктор для EF Core
+		private MerchandiseRequest() { }
+
 		// Приватные поля для навигационных свойств
 		private long _skuPresetId;
 		private string _employeeEmail;
@@ -25,25 +28,15 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		private MerchandiseRequest(
 			long id,
 			long skuPresetId,
-			string employeeEmail,
-			string clothingSize,
 			MerchandiseRequestStatus status,
 			DateTimeOffset createdAt,
 			DateTimeOffset? giveOutAt)
 		{
 			Id = id;
 			_skuPresetId = skuPresetId;
-			_employeeEmail = employeeEmail;
-			_clothingSize = clothingSize;
-
 			Status = status;
 			CreatedAt = createdAt;
 			GiveOutAt = giveOutAt;
-
-			// Инициализация Value Objects
-			Employee = new Employee(
-				email: Email.Create(_employeeEmail),
-				clothingSize: ClothingSize.Parse(_clothingSize));
 		}
 
 		/// <summary>
@@ -89,12 +82,11 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			var newRequest = new MerchandiseRequest(
 					id: 0,
 					skuPresetId: skuPreset.Id,
-					employeeEmail: employee.Email.Value,
-					clothingSize: employee.ClothingSize.Name,
 					status: MerchandiseRequestStatus.New,
 					createdAt: createAt,
 					giveOutAt: null)
 			{
+				Employee = employee,
 				SkuPreset = skuPreset
 			};
 

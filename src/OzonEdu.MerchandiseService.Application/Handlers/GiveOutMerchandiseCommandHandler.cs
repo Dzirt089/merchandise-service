@@ -3,7 +3,6 @@
 using OzonEdu.MerchandiseService.Application.Commands.GiveOutMerchandise;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
-using OzonEdu.MerchandiseService.Domain.Root.Exceptions;
 using OzonEdu.StockApi.Grpc;
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
@@ -26,27 +25,24 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 
 		public async Task<bool> Handle(GiveOutMerchandiseCommand request, CancellationToken cancellationToken)
 		{
+			var presetType = PresetType.Parse(request.Type);
+			var clothingSize = ClothingSize.Parse(request.ClothinSize);
+
 			//Найти SkuPreset
-			SkuPreset? skuPreset = await _skuPresetRepository.FindByTypeAsync(PresetType.Parse(request.Type), cancellationToken);
+			SkuPreset? skuPreset = await _skuPresetRepository.FindByTypeAsync(presetType, clothingSize, cancellationToken); //+ clothing_size
 
 			//Найти все запросы мерча, которые выдавались сотруднику
 			var alreadyExistsRequests = await _merchandiseRepository.GetByEmployeeEmailAsync(Email.Create(request.Email), cancellationToken);
 
 			//Создать запрос на выдачу мерча
 			MerchandiseRequest? newMerchandiseRequest;
-			try
-			{
-				newMerchandiseRequest = MerchandiseRequest.Create(
-				skuPreset: skuPreset,
-				employee: new Employee(email: Email.Create(request.Email), clothingSize: ClothingSize.Parse(request.ClothinSize)),
-				alreadyExistedRequest: alreadyExistsRequests,
-				createAt: DateTimeOffset.UtcNow);
-			}
-			catch (DomainException)
-			{
-				//Если не удалось создать запрос, значит выдача мерча невозможна
-				return false;
-			}
+
+			newMerchandiseRequest = MerchandiseRequest.Create(
+			skuPreset: skuPreset,
+			employee: new Employee(email: Email.Create(request.Email), clothingSize: ClothingSize.Parse(request.ClothinSize)),
+			alreadyExistedRequest: alreadyExistsRequests,
+			createAt: DateTimeOffset.UtcNow);
+
 
 			//Сохраняем в БД
 			var newId = await _merchandiseRepository.CreateAsync(newMerchandiseRequest, cancellationToken);
@@ -57,7 +53,7 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 
 
 			//Забронировать мерч
-			var skuPackAvailable = await _stockApiGrpcClient
+			GiveOutItemsResponse? skuPackAvailable = await _stockApiGrpcClient
 				.GiveOutItemsAsync(giveOutItems, cancellationToken: cancellationToken);
 
 			bool isskuPackAvailable = false;
@@ -67,15 +63,8 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 
 			//Выдаем мерч
 			MerchandiseRequestStatus? statusRequest;
-			try
-			{
-				statusRequest = newMerchandiseRequest.GiveOut(isskuPackAvailable, DateTimeOffset.UtcNow);
-			}
-			catch (DomainException)
-			{
-				//Если не удалось выдать мерч, значит выдача мерча невозможна
-				return false;
-			}
+			statusRequest = newMerchandiseRequest.GiveOut(isskuPackAvailable, DateTimeOffset.UtcNow);
+
 
 			//Обновляем статус заявки
 			await _merchandiseRepository.UpdateAsync(newMerchandiseRequest, cancellationToken);
