@@ -9,7 +9,7 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
 		{
 			Create
 				.Table("sku_presets")
-				.WithColumn("id").AsInt32().PrimaryKey().Identity()
+				.WithColumn("id").AsInt64().PrimaryKey().Identity()
 				.WithColumn("preset_type_id").AsInt32().NotNullable();
 		}
 

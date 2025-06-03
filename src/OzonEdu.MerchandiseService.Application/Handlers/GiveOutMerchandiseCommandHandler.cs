@@ -43,14 +43,11 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 			alreadyExistedRequest: alreadyExistsRequests,
 			createAt: DateTimeOffset.UtcNow);
 
-
 			//Сохраняем в БД
 			var newId = await _merchandiseRepository.CreateAsync(newMerchandiseRequest, cancellationToken);
 
-
 			GiveOutItemsRequest giveOutItems = new GiveOutItemsRequest();
 			giveOutItems.Items.AddRange(skuPreset.SkuCollection.Select(x => new SkuQuantityItem { Sku = x.Value, Quantity = 1 }));
-
 
 			//Забронировать мерч
 			GiveOutItemsResponse? skuPackAvailable = await _stockApiGrpcClient
@@ -65,9 +62,11 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 			MerchandiseRequestStatus? statusRequest;
 			statusRequest = newMerchandiseRequest.GiveOut(isskuPackAvailable, DateTimeOffset.UtcNow);
 
+			await _skuPresetRepository.CreateAsync(skuPreset, cancellationToken);
+
 
 			//Обновляем статус заявки
-			await _merchandiseRepository.UpdateAsync(newMerchandiseRequest, cancellationToken);
+			//await _merchandiseRepository.UpdateAsync(newMerchandiseRequest, cancellationToken);
 
 			if (Equals(statusRequest.Name, MerchandiseRequestStatus.Done))
 			{

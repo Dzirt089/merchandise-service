@@ -9,10 +9,10 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
 		{
 			if (!TableExists(CommonConstants.MerchandiseRequestsTable))
 			{
-				Create.Table(CommonConstants.MerchandiseRequestsTable)
+				Create.Table("merchandise_requests")
 					.WithColumn("Id").AsInt64().PrimaryKey().Identity()
 					.WithColumn("sku_preset_id").AsInt64().NotNullable()
-					.WithColumn("merchandise_request_status_id").AsInt32().NotNullable()
+					.WithColumn("merchandise_request_status").AsString().NotNullable()
 					.WithColumn("created_at").AsDateTimeOffset().NotNullable()
 					.WithDefaultValue(SystemMethods.CurrentUTCDateTime)
 					.WithColumn("give_out_at").AsDateTimeOffset().Nullable()

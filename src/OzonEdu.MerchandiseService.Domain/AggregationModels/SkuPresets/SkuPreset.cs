@@ -83,10 +83,5 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 				SkuCollection.Remove(sku);
 			}
 		}
-
-		//public static IEnumerable<PresetType> GetAll()
-		//{
-		//	return [PresetType.WelcomePack, PresetType.ConferenceListenerPack, PresetType.ConferenceSpeakerPack, PresetType.ProbationPeriodEndingPack, PresetType.VeteranPack];
-		//}
 	}
 }

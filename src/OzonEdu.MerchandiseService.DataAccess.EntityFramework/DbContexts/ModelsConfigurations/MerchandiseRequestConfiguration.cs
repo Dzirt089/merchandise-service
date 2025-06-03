@@ -11,32 +11,22 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.Model
 		{
 			builder.ToTable("merchandise_requests");
 			builder.HasKey(r => r.Id);
+			builder.Property(x => x.Id).HasColumnName("Id").ValueGeneratedOnAdd();
 
 			// Используем поля для всех бэкинг-филдов
 			builder.UsePropertyAccessMode(PropertyAccessMode.Field);
-
-			//Важно: UsePropertyAccessMode(Field) заставит EF пропустить конструкторы и сразу наполнить приватные поля(_employeeEmail, _clothingSize, _skuPresetId) через reflection.
 
 			// Бэкинг-филд для skuPresetId
 			builder.Property<long>("_skuPresetId")
 				   .HasColumnName("sku_preset_id")
 				   .IsRequired();
 
-			//builder.Property<string>("_employeeEmail")
-			//	   .HasColumnName("employee_email")
-			//	   .IsRequired()
-			//	   .HasMaxLength(255);
-
-			//builder.Property<string>("_clothingSize")
-			//	   .HasColumnName("clothing_size")
-			//	   .IsRequired(false);
-
 			// Проперти для статуса через ValueConverter
 			builder.Property(r => r.Status)
-				   .HasColumnName("merchandise_request_status_id")
+				   .HasColumnName("merchandise_request_status")
 				   .HasConversion(
-					   v => v.Id,                            // to db: int
-					   v => MerchandiseRequestStatus.Parse(v.ToString()))
+					   vo => vo.Name,                            // to db: int
+					   v => MerchandiseRequestStatus.Parse(v))
 				   .IsRequired();
 
 			builder.Property(r => r.CreatedAt)

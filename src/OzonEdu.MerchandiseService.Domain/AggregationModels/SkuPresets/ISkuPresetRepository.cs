@@ -11,7 +11,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 		/// <param name="skuPreset"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
-		Task SaveAsync(SkuPreset skuPreset, CancellationToken cancellationToken);
+		Task CreateAsync(SkuPreset skuPreset, CancellationToken cancellationToken);
 
 		/// <summary>
 		/// Получение набора мерча по идентификатору

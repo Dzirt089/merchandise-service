@@ -51,6 +51,16 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets
 			_ => throw new DomainException("Unknown preset type name")
 		};
 
+		public static PresetType Parse(int id) => id switch
+		{
+			1 => WelcomePack,
+			2 => ConferenceListenerPack,
+			3 => ConferenceSpeakerPack,
+			4 => ProbationPeriodEndingPack,
+			5 => VeteranPack,
+			_ => throw new DomainException("Unknown preset type name")
+		};
+
 
 		/// <summary>
 		/// Конструктор

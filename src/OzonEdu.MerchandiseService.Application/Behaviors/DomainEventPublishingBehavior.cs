@@ -22,9 +22,6 @@ namespace OzonEdu.MerchandiseService.Application.Behaviors
 			// Выполняем запрос
 			var response = await next();
 
-			// Сохраняем изменения в БД
-			await _context.SaveChangesAsync(cancellationToken);
-
 			// Собираем и публикуем события домена
 			var entities = _context.ChangeTracker
 				.Entries<Entity>()
@@ -47,6 +44,9 @@ namespace OzonEdu.MerchandiseService.Application.Behaviors
 				var tasks = domainEvents.Select(e => _mediator.Publish(e, cancellationToken));
 				await Task.WhenAll(tasks);
 			}
+
+			// Сохраняем изменения в БД
+			await _context.SaveChangesAsync(cancellationToken);
 
 			return response;
 		}

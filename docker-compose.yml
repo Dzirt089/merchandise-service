@@ -4,19 +4,21 @@ services:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      -  "8080:80"  
+      - "8080:80"  
       - "5060:5006"
       - "5062:5008" 
     depends_on:
-      jaeger:
-        condition: service_started
+      # jaeger:
+      #   condition: service_started
       merchandise-services-db:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      zookeeper:
-        condition: service_started
-      broker:
+      # elasticsearch:
+      #   condition: service_healthy
+      # zookeeper:
+      #   condition: service_started
+      # broker:
+      #   condition: service_started
+      stock-api:
         condition: service_started
     environment:
       OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger
@@ -32,18 +34,77 @@ services:
     networks:
       - merch-network  
     restart: unless-stopped
+
+  stock-api:
+    image: ghcr.io/dzirt089/ozonedu.stockapi:master
+    ports:
+      - "5070:5000"
+      - "5072:5002"
+    environment:
+      OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger
+      OTEL_EXPORTER_JAEGER_AGENT_PORT: "6831"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      DatabaseConnectionOptions__ConnectionString: >
+         Host=stock-api-db;
+         Port=5432;
+         Database=stock-api;
+         Username=postgres;
+         Password=stockApiPassword      
+    depends_on:
+      jaeger:
+        condition: service_started
+      stock-api-db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      zookeeper:
+        condition: service_started
+      broker:
+        condition: service_started
+    networks:
+      - merch-network  
+    restart: unless-stopped
       
   merchandise-services-db:
     image: postgres:latest
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-     # - ./pg_data:/var/lib/postgresql/data
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data
+    #  # - ./pg_data:/var/lib/postgresql/data
     ports:
       - "5436:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: merchandiseServicesPassword
       POSTGRES_DB: merchandise-services
+    command: "-c log_statement=all"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"] #встроенная команда PostgreSQL, говорит: "Я готов!"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - merch-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  stock-api-db:
+    image: postgres:latest
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5426:5432"
+    environment:
+      BootstrapServers: "broker:29092"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: stockApiPassword
+      POSTGRES_DB: stock-api
     command: "-c log_statement=all"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"] #встроенная команда PostgreSQL, говорит: "Я готов!"

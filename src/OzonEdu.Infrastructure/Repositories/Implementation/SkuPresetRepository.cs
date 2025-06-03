@@ -40,9 +40,9 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 			throw new NotImplementedException();
 		}
 
-		public Task SaveAsync(SkuPreset skuPreset, CancellationToken cancellationToken)
+		public async Task CreateAsync(SkuPreset skuPreset, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			await _context.SkuPresets.AddAsync(skuPreset, cancellationToken);
 		}
 	}
 }

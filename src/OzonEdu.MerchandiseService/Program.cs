@@ -29,6 +29,7 @@ public class Program
 		builder.AddInfrastructureOpenTelemetry();
 		builder.Services.AddEndpointsApiExplorer();
 		builder.ConfigurePorts();
+		builder.Services.AddStockGrpcServiceClient(configuration);
 		builder.Services.AddInfrastructureSwagger();
 		builder.Services.AddInfrastructureEndpoints();
 		builder.Services.AddInfrastructureMiddlewareGrpc();

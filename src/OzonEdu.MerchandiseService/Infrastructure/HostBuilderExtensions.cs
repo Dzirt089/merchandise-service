@@ -8,7 +8,6 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-using OzonEdu.MerchandiseService.Application.Contracts;
 using OzonEdu.MerchandiseService.DataAccess.EntityFramework.Configurations;
 using OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts;
 using OzonEdu.MerchandiseService.Infrastructure.Filters;
@@ -30,20 +29,22 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 	{
 		public static IServiceCollection AddStockGrpcServiceClient(this IServiceCollection services, IConfiguration configuration)
 		{
-			var connectionAddres = configuration
-				.GetSection(nameof(StockApiGrpcServiceConfiguration))
-				.Get<StockApiGrpcServiceConfiguration>()
-				.ServerAddress;
+			//var connectionAddres = configuration
+			//	.GetSection(nameof(StockApiGrpcServiceConfiguration))
+			//	.Get<StockApiGrpcServiceConfiguration>()
+			//	.ServerAddress;
 
-			if (string.IsNullOrWhiteSpace(connectionAddres))
-			{
-				connectionAddres = configuration
-					.Get<StockApiGrpcServiceConfiguration>()
-					.ServerAddress;
-			}
-
+			//if (string.IsNullOrWhiteSpace(connectionAddres))
+			//{
+			//	connectionAddres = configuration
+			//		.Get<StockApiGrpcServiceConfiguration>()
+			//		.ServerAddress;
+			//}
+			var connectionAddres = configuration["StockApiGrpcServiceConfiguration:ServerAddress"];
 			services.AddScoped<StockApiGrpc.StockApiGrpcClient>(provider =>
 			{
+
+
 				var channel = GrpcChannel.ForAddress(connectionAddres);
 				return new StockApiGrpc.StockApiGrpcClient(channel);
 			});

@@ -16,8 +16,8 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 
 		public async Task<long> CreateAsync(MerchandiseRequest merchandiseRequest, CancellationToken cancellationToken)
 		{
-			await _context.MerchandiseRequests.AddAsync(merchandiseRequest, cancellationToken);
-			return merchandiseRequest.Id;
+			var result = await _context.MerchandiseRequests.AddAsync(merchandiseRequest, cancellationToken);
+			return result.Entity.Id;
 		}
 
 		public Task<IReadOnlyCollection<MerchandiseRequest>> GetAllProcessingRequestsAsync(CancellationToken cancellationToken)
@@ -39,9 +39,9 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 			throw new NotImplementedException();
 		}
 
-		public Task UpdateAsync(MerchandiseRequest merchandiseRequest, CancellationToken cancellationToken)
+		public async Task UpdateAsync(MerchandiseRequest merchandiseRequest, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			_context.MerchandiseRequests.Update(merchandiseRequest);
 		}
 	}
 }
