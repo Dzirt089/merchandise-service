@@ -8,16 +8,8 @@ services:
       - "5060:5006"
       - "5062:5008" 
     depends_on:
-      # jaeger:
-      #   condition: service_started
       merchandise-services-db:
-        condition: service_healthy
-      # elasticsearch:
-      #   condition: service_healthy
-      # zookeeper:
-      #   condition: service_started
-      # broker:
-      #   condition: service_started
+        condition: service_healthy    
       stock-api:
         condition: service_started
     environment:

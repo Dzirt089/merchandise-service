@@ -32,17 +32,17 @@ namespace OzonEdu.MerchandiseService.Application.Behaviors
 			foreach (var entity in entities)
 			{
 				var domainEvents = entity.DomainEvents.ToList();
-				entity.ClearDomainEvents();
 
 				// Публикуем события домена
 				//foreach (var domainEvent in domainEvents)
 				//{
 				//	await _mediator.Publish(domainEvent, cancellationToken);
 				//}
-
 				// Пакетная отправка
 				var tasks = domainEvents.Select(e => _mediator.Publish(e, cancellationToken));
 				await Task.WhenAll(tasks);
+
+				entity.ClearDomainEvents();
 			}
 
 			// Сохраняем изменения в БД
@@ -52,3 +52,25 @@ namespace OzonEdu.MerchandiseService.Application.Behaviors
 		}
 	}
 }
+//Просто программист, [03.06.2025 20:36]
+//Транзакция тут не нужна. НО у вас тут возможны ралли. Вы сначала публикуете события а потом делаете savechanges. И возможна такая ситуация. Что ваша БД по какой-то причине затупит. Консюмер получит событие, Запроси данные у вашего сервиса, а данные еще старые.
+
+//Просто программист, [03.06.2025 20:37]
+//И доменные события сначала надо публиковать, а потом уже удалять. Если что-то пойдет не так, вы потеряете их
+
+//Ну и WhenAll не гарантирует вам последовательность публикации событий, а это очень важно. Ведь у вас может быть  EntityCreatedEvent, PropretyChangedEvent, и если они попадут в очередь в другой последовательности будет не хорошо
+
+//У нас вот такая посделовательность бихевиров.
+//DomainEventsDispatchingBehavior<,> - собираем доменные события, отдаем их хендлерам
+//UnitOfWorkBehavior<,> - сохраняем изменения в БД
+//IntegrationEventsDispatchingBehavior<,> - публикуем события которые нагенерили хендлеры доменных событий
+//LoggingBehavior<,> - распихиваем логи по разным системам
+
+
+#region по-штучная отправка
+// Публикуем события домена
+//foreach (var domainEvent in domainEvents)
+//{
+//	await _mediator.Publish(domainEvent, cancellationToken);
+//}
+#endregion
