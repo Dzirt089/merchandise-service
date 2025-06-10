@@ -7,6 +7,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 	/// </summary>
 	public class Employee : ValueObject
 	{
+		private Employee() { }
 		public Employee(Email email, ClothingSize clothingSize)
 		{
 			Email = email;
@@ -16,12 +17,12 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <summary>
 		/// Email сотрудника
 		/// </summary>
-		public Email Email { get; }
+		public Email Email { get; private set; }
 
 		/// <summary>
 		/// Размер одежды сотрудника
 		/// </summary>
-		public ClothingSize ClothingSize { get; }
+		public ClothingSize ClothingSize { get; private set; }
 
 		protected override IEnumerable<object> GetEqualityComponents()
 		{

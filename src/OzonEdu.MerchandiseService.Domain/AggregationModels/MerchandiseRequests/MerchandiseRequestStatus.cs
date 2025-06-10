@@ -1,4 +1,5 @@
 ﻿using OzonEdu.MerchandiseService.Domain.Root;
+using OzonEdu.MerchandiseService.Domain.Root.Exceptions;
 
 namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests
 {
@@ -30,5 +31,20 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		public MerchandiseRequestStatus(int id, string name) : base(id, name)
 		{
 		}
+
+		/// <summary>
+		/// Преобразование строки в тип пресета
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		/// <exception cref="DomainException"></exception>
+		public static MerchandiseRequestStatus Parse(string name) => name?.ToUpper() switch
+		{
+			"new" => New,
+			"processing" => Processing,
+			"done" => Done,
+			"declined" => Declined,
+			_ => throw new DomainException("Unknown preset type name")
+		};
 	}
 }

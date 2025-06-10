@@ -25,6 +25,8 @@ namespace OzonEdu.MerchandiseService.Domain.Root
 		/// <param name="name"></param>
 		protected Enumeration(int id, string name) => (Id, Name) = (id, name);
 
+		protected Enumeration() { }
+
 		/// <summary>
 		/// Преобразование в строку
 		/// </summary>

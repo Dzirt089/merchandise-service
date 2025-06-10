@@ -2,70 +2,64 @@
 
 using Grpc.Core;
 
+using MediatR;
+
+using OzonEdu.MerchandiseService.Application.Commands.GiveOutMerchandise;
+using OzonEdu.MerchandiseService.Application.Queries.GetRequestsByEmployee;
 using OzonEdu.MerchandiseService.Grpc;
-using OzonEdu.MerchandiseService.Services;
 
 namespace OzonEdu.MerchandiseService.GrpcServices
 {
 	public class MerchApiGrpsService : MerchandiseServiceGrpc.MerchandiseServiceGrpcBase
 	{
-		private readonly IMerchService _merchService;
+		private readonly IMediator _mediator;
 
-		public MerchApiGrpsService(IMerchService merchService)
+		public MerchApiGrpsService(IMediator merchService)
 		{
-			_merchService = merchService;
+			_mediator = merchService;
 		}
 
-		public override async Task<GetAllMerchandiseItemsResponse> GetAllMerchandiseITems(
-			GetAllMerchandiseItemsRequest request,
+		public override async Task<GetRequestsByEmployeeResponse>
+			GetRequestsByEmployee(
+			GetRequestsByEmployeeRequest request,
 			ServerCallContext context)
 		{
-			var merchItems = await _merchService.GetAll(context.CancellationToken);
-			return new GetAllMerchandiseItemsResponse
-			{
-				MerchItems = {
-					merchItems.Select(x=>new GetAllMerchandiseItemsResponseUnit
-					{
-						ItemId = x.Id,
-						ItemName = x.ItemName,
-						ItemQuantity = x.Quantity,
-					})}
-			};
-		}
+			GetRequestsByEmployeeQueryResponse? result = await _mediator.Send(new GetRequestsByEmployeeQuery(), context.CancellationToken);
 
-		public override async Task<GetAllMerchandiseItemsResponse> GetAllMerchandiseITemsV2(
-			Empty request,
-			ServerCallContext context)
-		{
-			var merchItems = await _merchService.GetAll(context.CancellationToken);
-			return new GetAllMerchandiseItemsResponse
+			var response = new GetRequestsByEmployeeResponse();
+
+			foreach (var item in result.Items)
 			{
-				MerchItems =
+				var unitResponse = new GetRequestsByEmployeeResponseUnit
 				{
-					merchItems.Select(x => new GetAllMerchandiseItemsResponseUnit
-					{
-						ItemId = x.Id,
-						ItemName = x.ItemName,
-						ItemQuantity = x.Quantity,
-					})
-				}
-			};
+					Type = item.Type,
+					Status = item.Status,
+					CreatedAt = Timestamp.FromDateTimeOffset(item.CreatedAt), // Convert DateTimeOffset to Timestamp
+				};
+
+				if (item.GiveOutAt.HasValue)
+					unitResponse.GiveOutAt = Timestamp.FromDateTimeOffset((DateTimeOffset)item.GiveOutAt);
+
+				response.Requests.Add(unitResponse);
+			}
+
+			return response;
 		}
 
-		public override async Task<GetOneMerchaniseItemResponse> GetOneMerchaniseItem(
-			GetOneMerchaniseItemRequest request,
+		public override async Task<GiveOutMerchandiseResponse>
+			GiveOutMerchandise(
+			GiveOutMerchandiseRequest request,
 			ServerCallContext context)
 		{
-			var merchItem = await _merchService.GetById(request.ItemId, context.CancellationToken);
-			return new GetOneMerchaniseItemResponse
+			var command = new GiveOutMerchandiseCommand
 			{
-				MerchItem = new GetAllMerchandiseItemsResponseUnit
-				{
-					ItemId = merchItem.Id,
-					ItemName = merchItem.ItemName,
-					ItemQuantity = merchItem.Quantity,
-				}
+				ClothinSize = request.MerchRequestUnit.ClothingSize,
+				Email = request.MerchRequestUnit.Email,
+				Type = request.MerchRequestUnit.Type
 			};
+
+			var result = await _mediator.Send(command, context.CancellationToken);
+			return new GiveOutMerchandiseResponse { ResponseCheck = result };
 		}
 	}
 }

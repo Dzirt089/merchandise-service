@@ -5,12 +5,26 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="ExternalServices\StockApiGrpcService\stock-api.proto" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CSharpCourse.Core.Lib" Version="2.1.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OzonEdu.MerchandiseService.DataAccess.EntityFramework\OzonEdu.MerchandiseService.DataAccess.EntityFramework.csproj" />
     <ProjectReference Include="..\OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="ExternalServices\StockApiGrpcService\stock-api.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

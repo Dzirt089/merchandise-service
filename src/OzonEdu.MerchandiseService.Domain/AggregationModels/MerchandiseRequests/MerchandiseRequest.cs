@@ -7,6 +7,15 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 {
 	public sealed class MerchandiseRequest : Entity
 	{
+		// Пустой конструктор для EF Core
+		private MerchandiseRequest() { }
+
+		// Приватные поля для навигационных свойств
+		private long _skuPresetId;
+		private string _employeeEmail;
+		private string _clothingSize;
+
+
 		/// <summary>
 		/// Конструктор для заполнения данными из БД при использовании Dapper или ADO.NET
 		/// </summary>
@@ -16,16 +25,15 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <param name="status">Статус заявки на выдачу мерча</param>
 		/// <param name="createdAt">Дата создания запроса</param>
 		/// <param name="giveOutAt">Дата выдачи мерча по запросу</param>
-		public MerchandiseRequest(long id,
-			SkuPreset skuPreset,
-			Employee employee,
+		private MerchandiseRequest(
+			long id,
+			long skuPresetId,
 			MerchandiseRequestStatus status,
 			DateTimeOffset createdAt,
 			DateTimeOffset? giveOutAt)
 		{
 			Id = id;
-			SkuPreset = skuPreset;
-			Employee = employee;
+			_skuPresetId = skuPresetId;
 			Status = status;
 			CreatedAt = createdAt;
 			GiveOutAt = giveOutAt;
@@ -34,12 +42,12 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <summary>
 		/// Идентификатор набора мерча
 		/// </summary>
-		public SkuPreset SkuPreset { get; }
+		public SkuPreset SkuPreset { get; private set; }
 
 		/// <summary>
 		/// Информация о сотруднике
 		/// </summary>
-		public Employee Employee { get; }
+		public Employee Employee { get; private set; }
 
 		/// <summary>
 		/// Статус запроса 
@@ -49,23 +57,13 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <summary>
 		/// Дата создания запроса
 		/// </summary>
-		public DateTimeOffset CreatedAt { get; }
+		public DateTimeOffset CreatedAt { get; private set; }
 
 		/// <summary>
 		/// Дата выдачи мерча по запросу
 		/// </summary>
 		public DateTimeOffset? GiveOutAt { get; private set; }
 
-		private MerchandiseRequest(
-			SkuPreset skuPreset,
-			Employee employee,
-			DateTimeOffset createdAt)
-		{
-			SkuPreset = skuPreset;
-			Employee = employee;
-			Status = MerchandiseRequestStatus.New;
-			CreatedAt = createdAt;
-		}
 
 		/// <summary>
 		/// Создание нового запроса на выдачу мерча
@@ -81,7 +79,17 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			IReadOnlyCollection<MerchandiseRequest> alreadyExistedRequest,
 			DateTimeOffset createAt)
 		{
-			var newRequest = new MerchandiseRequest(skuPreset, employee, createAt);
+			var newRequest = new MerchandiseRequest(
+					id: 0,
+					skuPresetId: skuPreset.Id,
+					status: MerchandiseRequestStatus.New,
+					createdAt: createAt,
+					giveOutAt: null)
+			{
+				Employee = employee,
+				SkuPreset = skuPreset
+			};
+
 			if (!newRequest.CheckAbilityToGiveOut(alreadyExistedRequest, createAt))
 			{
 				throw new DomainException("Merchandise is unable to gave out");
@@ -155,6 +163,8 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			//TODO: реализовать проверку на возможность выдачи мерча
 			//Например, сотрудник проработал меньше срока, положенного на выдаваемый набор мерча.
 			//Или повторно пытаемся что-то выдать
+
+
 
 			return true;
 		}
