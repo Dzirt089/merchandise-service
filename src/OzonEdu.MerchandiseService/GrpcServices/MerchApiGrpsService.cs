@@ -24,7 +24,7 @@ namespace OzonEdu.MerchandiseService.GrpcServices
 			GetRequestsByEmployeeRequest request,
 			ServerCallContext context)
 		{
-			GetRequestsByEmployeeQueryResponse? result = await _mediator.Send(new GetRequestsByEmployeeQuery(), context.CancellationToken);
+			GetRequestsByEmployeeQueryResponse? result = await _mediator.Send(new GetRequestsByEmployeeQuery() { Email = request.Email }, context.CancellationToken);
 
 			var response = new GetRequestsByEmployeeResponse();
 

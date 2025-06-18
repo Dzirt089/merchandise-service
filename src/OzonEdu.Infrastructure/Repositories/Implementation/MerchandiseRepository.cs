@@ -37,6 +37,7 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 
 			var result = await _context.MerchandiseRequests
 				.Where(x => x.Employee.Email == email)
+				.Include(s => s.SkuPreset)
 				.ToListAsync(cancellationToken);
 
 			return result;

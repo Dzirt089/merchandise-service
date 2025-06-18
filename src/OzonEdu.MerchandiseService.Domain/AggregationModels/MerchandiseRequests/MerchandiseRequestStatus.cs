@@ -38,7 +38,7 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 		/// <param name="name"></param>
 		/// <returns></returns>
 		/// <exception cref="DomainException"></exception>
-		public static MerchandiseRequestStatus Parse(string name) => name?.ToUpper() switch
+		public static MerchandiseRequestStatus Parse(string name) => name?.ToLower() switch
 		{
 			"new" => New,
 			"processing" => Processing,
