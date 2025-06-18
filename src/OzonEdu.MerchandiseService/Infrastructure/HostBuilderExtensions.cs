@@ -18,7 +18,6 @@ using OzonEdu.StockApi.Grpc;
 using Serilog;
 using Serilog.Events;
 
-using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 
@@ -29,17 +28,6 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 	{
 		public static IServiceCollection AddStockGrpcServiceClient(this IServiceCollection services, IConfiguration configuration)
 		{
-			//var connectionAddres = configuration
-			//	.GetSection(nameof(StockApiGrpcServiceConfiguration))
-			//	.Get<StockApiGrpcServiceConfiguration>()
-			//	.ServerAddress;
-
-			//if (string.IsNullOrWhiteSpace(connectionAddres))
-			//{
-			//	connectionAddres = configuration
-			//		.Get<StockApiGrpcServiceConfiguration>()
-			//		.ServerAddress;
-			//}
 			var connectionAddres = configuration["StockApiGrpcServiceConfiguration:ServerAddress"];
 			services.AddScoped<StockApiGrpc.StockApiGrpcClient>(provider =>
 			{
@@ -159,10 +147,10 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 					});
 			});
 
-			var activitySource = new ActivitySource("OzonEdu.MerchandiseService");
-			using var activity = activitySource.StartActivity("ManualTestSpan");
-			activity?.SetTag("custom.tag", "hello_jaeger");
-			activity?.SetStatus(ActivityStatusCode.Ok);
+			//var activitySource = new ActivitySource("OzonEdu.MerchandiseService");
+			//using var activity = activitySource.StartActivity("ManualTestSpan");
+			//activity?.SetTag("custom.tag", "hello_jaeger");
+			//activity?.SetStatus(ActivityStatusCode.Ok);
 
 			return app;
 		}

@@ -4,19 +4,25 @@ using OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
 
+using System.Diagnostics;
+
 namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 {
 	public class SkuPresetRepository : ISkuPresetRepository
 	{
 		private readonly MerchandiseDbContext _context;
+		private readonly ActivitySource _activitySource;
 
-		public SkuPresetRepository(MerchandiseDbContext context)
+		public SkuPresetRepository(MerchandiseDbContext context, ActivitySource activitySource = null)
 		{
 			_context = context;
+			_activitySource = activitySource;
 		}
 
 		public async Task<SkuPreset> FindByTypeAsync(PresetType type, ClothingSize clothingSize, CancellationToken cancellationToken)
 		{
+			using var activity = _activitySource.StartActivity("SkuPresetRepository.FindByTypeAsync", ActivityKind.Internal);
+
 			var result = await _context.Skus
 				.Where(x => x.PresetTypeId == type.Id
 				&& (x.ClothingSize == null
@@ -42,6 +48,8 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation
 
 		public async Task CreateAsync(SkuPreset skuPreset, CancellationToken cancellationToken)
 		{
+			using var activity = _activitySource.StartActivity("SkuPresetRepository.CreateAsync", ActivityKind.Internal);
+
 			await _context.SkuPresets.AddAsync(skuPreset, cancellationToken);
 		}
 	}

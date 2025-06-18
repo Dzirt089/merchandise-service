@@ -4,15 +4,19 @@ using OzonEdu.MerchandiseService.Application.Models.DTOs;
 using OzonEdu.MerchandiseService.Application.Queries.GetRequestsByEmployee;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 
+using System.Diagnostics;
+
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
 	public sealed class GetRequestsByEmployeeQueryHandler : IRequestHandler<GetRequestsByEmployeeQuery, GetRequestsByEmployeeQueryResponse>
 	{
 		private readonly IMerchandiseRepository _merchandiseRepository;
+		private readonly ActivitySource _activitySource;
 
-		public GetRequestsByEmployeeQueryHandler(IMerchandiseRepository merchandiseRepository)
+		public GetRequestsByEmployeeQueryHandler(IMerchandiseRepository merchandiseRepository, ActivitySource activitySource = null)
 		{
 			_merchandiseRepository = merchandiseRepository;
+			_activitySource = activitySource;
 		}
 
 		/// <summary>
@@ -20,6 +24,8 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 		/// </summary>
 		public async Task<GetRequestsByEmployeeQueryResponse> Handle(GetRequestsByEmployeeQuery request, CancellationToken cancellationToken)
 		{
+			using var activity = _activitySource.StartActivity("QueryHandler.GetRequestsByEmployee", ActivityKind.Internal);
+
 			// Получаем все заявки на выдачу мерча по email сотрудника
 			var requests =
 				await _merchandiseRepository.GetByEmployeeEmailAsync(Email.Create(request.Email), cancellationToken);

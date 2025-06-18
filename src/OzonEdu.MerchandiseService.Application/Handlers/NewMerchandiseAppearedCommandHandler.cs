@@ -4,22 +4,30 @@ using OzonEdu.MerchandiseService.Application.Commands.NewMerchandiseAppeared;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 using OzonEdu.StockApi.Grpc;
 
+using System.Diagnostics;
+
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
 	public sealed class NewMerchandiseAppearedCommandHandler : IRequestHandler<NewMerchandiseAppearedCommand>
 	{
+		private readonly ActivitySource _activitySource;
 		private readonly IMerchandiseRepository _merchandiseRepository;
 		private readonly StockApiGrpc.StockApiGrpcClient _stockApiGrpcClient;
 
 		public NewMerchandiseAppearedCommandHandler(
-			IMerchandiseRepository merchandiseRepository, StockApiGrpc.StockApiGrpcClient stockApiGrpcClient = null)
+			IMerchandiseRepository merchandiseRepository,
+			StockApiGrpc.StockApiGrpcClient stockApiGrpcClient = null,
+			ActivitySource activitySource = null)
 		{
 			_merchandiseRepository = merchandiseRepository;
 			_stockApiGrpcClient = stockApiGrpcClient;
+			_activitySource = activitySource;
 		}
 
 		public async Task Handle(NewMerchandiseAppearedCommand request, CancellationToken cancellationToken)
 		{
+			using var activity = _activitySource.StartActivity("CommandHandler.NewMerchandiseAppeared", ActivityKind.Internal);
+
 			IReadOnlyCollection<MerchandiseRequest>? allProcessingRequest = await _merchandiseRepository.GetAllProcessingRequestsAsync(cancellationToken);
 
 			allProcessingRequest = allProcessingRequest

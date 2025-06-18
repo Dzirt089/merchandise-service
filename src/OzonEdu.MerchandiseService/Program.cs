@@ -9,6 +9,8 @@ using OzonEdu.MerchandiseService.Infrastructure;
 using OzonEdu.MerchandiseService.Infrastructure.Filters;
 using OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation;
 using OzonEdu.MerchandiseService.Services;
+
+using System.Diagnostics;
 public class Program
 {
 	private static void Main(string[] args)
@@ -34,6 +36,8 @@ public class Program
 		builder.Services.AddInfrastructureEndpoints();
 		builder.Services.AddInfrastructureMiddlewareGrpc();
 		builder.Services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
+
+		builder.Services.AddSingleton(activSource => new ActivitySource("OzonEdu.MerchandiseService"));
 
 		builder.Services.AddSingleton<IMerchService, MerchService>();
 

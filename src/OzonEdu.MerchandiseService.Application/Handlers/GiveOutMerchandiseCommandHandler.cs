@@ -5,6 +5,8 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
 using OzonEdu.StockApi.Grpc;
 
+using System.Diagnostics;
+
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
 	public sealed class GiveOutMerchandiseCommandHandler : IRequestHandler<GiveOutMerchandiseCommand, bool>
@@ -12,19 +14,24 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 		private readonly IMerchandiseRepository _merchandiseRepository;
 		private readonly ISkuPresetRepository _skuPresetRepository;
 		private readonly StockApiGrpc.StockApiGrpcClient _stockApiGrpcClient;
+		private readonly ActivitySource _activitySource;
 
 		public GiveOutMerchandiseCommandHandler(
 			IMerchandiseRepository merchandiseRepository,
 			ISkuPresetRepository skuPresetRepository,
-			StockApiGrpc.StockApiGrpcClient stockApiGrpcClient = null)
+			StockApiGrpc.StockApiGrpcClient stockApiGrpcClient = null,
+			ActivitySource activitySource = null)
 		{
 			_merchandiseRepository = merchandiseRepository;
 			_skuPresetRepository = skuPresetRepository;
 			_stockApiGrpcClient = stockApiGrpcClient;
+			_activitySource = activitySource;
 		}
 
 		public async Task<bool> Handle(GiveOutMerchandiseCommand request, CancellationToken cancellationToken)
 		{
+			using var activity = _activitySource.StartActivity("CommandHandler.GiveOutMerchandise", ActivityKind.Internal);
+
 			var presetType = PresetType.Parse(request.Type);
 			var clothingSize = ClothingSize.Parse(request.ClothinSize);
 

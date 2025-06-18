@@ -11,7 +11,7 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.Model
 		{
 			builder.ToTable("merchandise_requests");
 			builder.HasKey(r => r.Id);
-			builder.Property(x => x.Id).HasColumnName("Id").ValueGeneratedOnAdd();
+			builder.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
 			// Используем поля для всех бэкинг-филдов
 			builder.UsePropertyAccessMode(PropertyAccessMode.Field);

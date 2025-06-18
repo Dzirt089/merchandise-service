@@ -10,7 +10,7 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
 			if (!TableExists(CommonConstants.MerchandiseRequestsTable))
 			{
 				Create.Table("merchandise_requests")
-					.WithColumn("Id").AsInt64().PrimaryKey().Identity()
+					.WithColumn("id").AsInt64().PrimaryKey().Identity()
 					.WithColumn("sku_preset_id").AsInt64().NotNullable()
 					.WithColumn("merchandise_request_status").AsString().NotNullable()
 					.WithColumn("created_at").AsDateTimeOffset().NotNullable()
