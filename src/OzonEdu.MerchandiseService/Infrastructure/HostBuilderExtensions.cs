@@ -31,8 +31,6 @@ namespace OzonEdu.MerchandiseService.Infrastructure
 			var connectionAddres = configuration["StockApiGrpcServiceConfiguration:ServerAddress"];
 			services.AddScoped<StockApiGrpc.StockApiGrpcClient>(provider =>
 			{
-
-
 				var channel = GrpcChannel.ForAddress(connectionAddres);
 				return new StockApiGrpc.StockApiGrpcClient(channel);
 			});

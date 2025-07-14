@@ -19,11 +19,11 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.Model
 				.UseIdentityColumn();
 
 			builder.Property(p => p.Type)
-								.HasColumnName("preset_type_id")
-								.HasConversion(
-									v => v.Id,
-									i => PresetType.Parse(i))
-								.IsRequired();
+				.HasColumnName("preset_type_id")
+				.HasConversion(
+					v => v.Id,
+					i => PresetType.Parse(i))
+				.IsRequired();
 
 			builder.OwnsMany<Sku>("SkuCollection", sa =>
 			{

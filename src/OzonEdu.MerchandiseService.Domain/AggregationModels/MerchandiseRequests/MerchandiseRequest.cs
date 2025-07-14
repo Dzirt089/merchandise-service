@@ -79,16 +79,17 @@ namespace OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequest
 			IReadOnlyCollection<MerchandiseRequest> alreadyExistedRequest,
 			DateTimeOffset createAt)
 		{
-			var newRequest = new MerchandiseRequest(
+			var newRequest =
+				new MerchandiseRequest(
 					id: 0,
 					skuPresetId: skuPreset.Id,
 					status: MerchandiseRequestStatus.New,
 					createdAt: createAt,
 					giveOutAt: null)
-			{
-				Employee = employee,
-				SkuPreset = skuPreset
-			};
+				{
+					Employee = employee,
+					SkuPreset = skuPreset
+				};
 
 			if (!newRequest.CheckAbilityToGiveOut(alreadyExistedRequest, createAt))
 			{

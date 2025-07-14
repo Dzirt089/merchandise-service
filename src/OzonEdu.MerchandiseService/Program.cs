@@ -23,7 +23,11 @@ public class Program
 
 		builder.Services.AddTransient(
 			typeof(IPipelineBehavior<,>),
-			typeof(DomainEventPublishingBehavior<,>));
+			typeof(DomainEventsDispatchingBehavior<,>));
+
+		builder.Services.AddTransient(
+			typeof(IPipelineBehavior<,>),
+			typeof(UnitOfWorkBehavior<,>));
 
 		builder.Services.AddMerchandiseServicesEntityFrameworkDb(configuration);
 
