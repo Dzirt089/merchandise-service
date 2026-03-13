@@ -1,7 +1,10 @@
 ﻿using MediatR;
 
+using OzonEdu.MerchandiseService.Application.Abstractions.Integration;
 using OzonEdu.MerchandiseService.Application.Commands.NewMerchandiseAppeared;
+using OzonEdu.MerchandiseService.Application.Integration;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
+using OzonEdu.MerchandiseService.Domain.Root.Diagnostics;
 using OzonEdu.StockApi.Grpc;
 
 using System.Diagnostics;
@@ -10,18 +13,22 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 {
 	public sealed class NewMerchandiseAppearedCommandHandler : IRequestHandler<NewMerchandiseAppearedCommand>
 	{
+		private const string EmailNotificationTopic = "email_notification_event";
 		private readonly ActivitySource _activitySource;
 		private readonly IMerchandiseRepository _merchandiseRepository;
+		private readonly IIntegrationOutboxWriter _integrationOutboxWriter;
 		private readonly StockApiGrpc.StockApiGrpcClient _stockApiGrpcClient;
 
 		public NewMerchandiseAppearedCommandHandler(
 			IMerchandiseRepository merchandiseRepository,
+			IIntegrationOutboxWriter integrationOutboxWriter,
 			StockApiGrpc.StockApiGrpcClient stockApiGrpcClient = null,
 			ActivitySource activitySource = null)
 		{
 			_merchandiseRepository = merchandiseRepository;
+			_integrationOutboxWriter = integrationOutboxWriter;
 			_stockApiGrpcClient = stockApiGrpcClient;
-			_activitySource = activitySource;
+			_activitySource = activitySource ?? MerchandiseTelemetry.ActivitySource;
 		}
 
 		public async Task Handle(NewMerchandiseAppearedCommand request, CancellationToken cancellationToken)
@@ -31,7 +38,7 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 			IReadOnlyCollection<MerchandiseRequest>? allProcessingRequest = await _merchandiseRepository.GetAllProcessingRequestsAsync(cancellationToken);
 
 			allProcessingRequest = allProcessingRequest
-				.Where(x => x.SkuPreset.SkuCollection.All(z => request.SkuCollection.Contains(z.Value)))
+				.Where(x => x.SkuPreset.SkuCollection.Any(z => request.SkuCollection.Contains(z.Value)))
 				.OrderBy(x => x.CreatedAt)
 				.ToList();
 
@@ -50,9 +57,21 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 
 				if (isAvailable)
 				{
-					merchandiseRequest.GiveOut(isAvailable, DateTimeOffset.UtcNow);
+					var status = merchandiseRequest.GiveOut(isAvailable, DateTimeOffset.UtcNow);
 
 					await _merchandiseRepository.UpdateAsync(merchandiseRequest, cancellationToken);
+
+					if (status == MerchandiseRequestStatus.Done)
+					{
+						await _integrationOutboxWriter.AddAsync(
+							EmailNotificationTopic,
+							merchandiseRequest.Employee.Email.Value,
+							NotificationEventFactory.CreateMerchDelivery(
+								merchandiseRequest.Employee.Email.Value,
+								merchandiseRequest.SkuPreset.Type.Id,
+								merchandiseRequest.Employee.ClothingSize.Id),
+							cancellationToken);
+					}
 				}
 			}
 		}

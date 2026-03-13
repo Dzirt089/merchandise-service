@@ -11,6 +11,8 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts
 	{
 		public DbSet<MerchandiseRequest> MerchandiseRequests => Set<MerchandiseRequest>();
 		public DbSet<SkuPreset> SkuPresets => Set<SkuPreset>();
+		public DbSet<IntegrationOutboxMessage> IntegrationOutboxMessages => Set<IntegrationOutboxMessage>();
+		public DbSet<IntegrationInboxMessage> IntegrationInboxMessages => Set<IntegrationInboxMessage>();
 
 		public DbSet<SkuDbModel> Skus => Set<SkuDbModel>();
 
@@ -20,6 +22,8 @@ namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts
 		{
 			modelBuilder.ApplyConfiguration(new MerchandiseRequestConfiguration());
 			modelBuilder.ApplyConfiguration(new SkuPresetConfiguration());
+			modelBuilder.ApplyConfiguration(new IntegrationOutboxMessageConfiguration());
+			modelBuilder.ApplyConfiguration(new IntegrationInboxMessageConfiguration());
 
 			modelBuilder.Entity<SkuDbModel>(b =>
 			{

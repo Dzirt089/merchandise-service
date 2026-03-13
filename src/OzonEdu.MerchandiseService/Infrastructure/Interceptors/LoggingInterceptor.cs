@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Interceptors;
 
+using System.Diagnostics;
 using System.Text.Json;
 namespace OzonEdu.MerchandiseService.Infrastructure.Interceptors
 {
@@ -23,7 +24,10 @@ namespace OzonEdu.MerchandiseService.Infrastructure.Interceptors
 			try
 			{
 				// название метода, который вызывают
-				_logger.LogInformation($"Grpc request {context.Method}");
+				_logger.LogInformation("Grpc request {Method} trace={TraceId} span={SpanId}",
+					context.Method,
+					Activity.Current?.TraceId.ToString(),
+					Activity.Current?.SpanId.ToString());
 
 				// Сериализуем request (Protobuf-сообщение) в JSON.
 				var requestJson = JsonSerializer.Serialize(request, JsonSerializerOptionsFactory.Default);

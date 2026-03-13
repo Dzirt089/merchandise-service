@@ -1,8 +1,11 @@
 ﻿using MediatR;
 
+using OzonEdu.MerchandiseService.Application.Abstractions.Integration;
 using OzonEdu.MerchandiseService.Application.Commands.GiveOutMerchandise;
+using OzonEdu.MerchandiseService.Application.Integration;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
+using OzonEdu.MerchandiseService.Domain.Root.Diagnostics;
 using OzonEdu.StockApi.Grpc;
 
 using System.Diagnostics;
@@ -11,21 +14,25 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 {
 	public sealed class GiveOutMerchandiseCommandHandler : IRequestHandler<GiveOutMerchandiseCommand, bool>
 	{
+		private const string EmailNotificationTopic = "email_notification_event";
 		private readonly IMerchandiseRepository _merchandiseRepository;
 		private readonly ISkuPresetRepository _skuPresetRepository;
+		private readonly IIntegrationOutboxWriter _integrationOutboxWriter;
 		private readonly StockApiGrpc.StockApiGrpcClient _stockApiGrpcClient;
 		private readonly ActivitySource _activitySource;
 
 		public GiveOutMerchandiseCommandHandler(
 			IMerchandiseRepository merchandiseRepository,
 			ISkuPresetRepository skuPresetRepository,
+			IIntegrationOutboxWriter integrationOutboxWriter,
 			StockApiGrpc.StockApiGrpcClient stockApiGrpcClient = null,
 			ActivitySource activitySource = null)
 		{
 			_merchandiseRepository = merchandiseRepository;
 			_skuPresetRepository = skuPresetRepository;
+			_integrationOutboxWriter = integrationOutboxWriter;
 			_stockApiGrpcClient = stockApiGrpcClient;
-			_activitySource = activitySource;
+			_activitySource = activitySource ?? MerchandiseTelemetry.ActivitySource;
 		}
 
 		public async Task<bool> Handle(GiveOutMerchandiseCommand request, CancellationToken cancellationToken)
@@ -51,7 +58,7 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 			createAt: DateTimeOffset.UtcNow);
 
 			//Сохраняем в БД
-			var newId = await _merchandiseRepository.CreateAsync(newMerchandiseRequest, cancellationToken);
+			await _merchandiseRepository.CreateAsync(newMerchandiseRequest, cancellationToken);
 
 			GiveOutItemsRequest giveOutItems = new GiveOutItemsRequest();
 			giveOutItems.Items.AddRange(skuPreset.SkuCollection.Select(x => new SkuQuantityItem { Sku = x.Value, Quantity = 1 }));
@@ -66,22 +73,22 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 				isskuPackAvailable = true;
 
 			//Выдаем мерч
-			MerchandiseRequestStatus? statusRequest;
-			statusRequest = newMerchandiseRequest.GiveOut(isskuPackAvailable, DateTimeOffset.UtcNow);
+			var statusRequest = newMerchandiseRequest.GiveOut(isskuPackAvailable, DateTimeOffset.UtcNow);
+			await _merchandiseRepository.UpdateAsync(newMerchandiseRequest, cancellationToken);
 
-			await _skuPresetRepository.CreateAsync(skuPreset, cancellationToken);
-
-
-			//Обновляем статус заявки
-			//await _merchandiseRepository.UpdateAsync(newMerchandiseRequest, cancellationToken);
-
-			if (Equals(statusRequest.Name, MerchandiseRequestStatus.Done))
+			if (statusRequest == MerchandiseRequestStatus.Done)
 			{
-				//Отправляем уведомление на почту
-				//await _emailService.SendEmail(newMerchandiseRequest.Employee.Email, new object());
+				await _integrationOutboxWriter.AddAsync(
+					EmailNotificationTopic,
+					newMerchandiseRequest.Employee.Email.Value,
+					NotificationEventFactory.CreateMerchDelivery(
+						newMerchandiseRequest.Employee.Email.Value,
+						newMerchandiseRequest.SkuPreset.Type.Id,
+						newMerchandiseRequest.Employee.ClothingSize.Id),
+					cancellationToken);
 			}
 
-			return true;
+			return statusRequest == MerchandiseRequestStatus.Done;
 		}
 	}
 }

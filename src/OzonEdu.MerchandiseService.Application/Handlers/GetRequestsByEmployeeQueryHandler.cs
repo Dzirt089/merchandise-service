@@ -3,6 +3,7 @@
 using OzonEdu.MerchandiseService.Application.Models.DTOs;
 using OzonEdu.MerchandiseService.Application.Queries.GetRequestsByEmployee;
 using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
+using OzonEdu.MerchandiseService.Domain.Root.Diagnostics;
 
 using System.Diagnostics;
 
@@ -16,7 +17,7 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 		public GetRequestsByEmployeeQueryHandler(IMerchandiseRepository merchandiseRepository, ActivitySource activitySource = null)
 		{
 			_merchandiseRepository = merchandiseRepository;
-			_activitySource = activitySource;
+			_activitySource = activitySource ?? MerchandiseTelemetry.ActivitySource;
 		}
 
 		/// <summary>

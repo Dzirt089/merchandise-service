@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
+using System.Reflection;
 
 namespace OzonEdu.MerchandiseService.Infrastructure.StartapFilters
 {
@@ -8,6 +10,16 @@ namespace OzonEdu.MerchandiseService.Infrastructure.StartapFilters
 		{
 			return app =>
 			{
+				app.UseHealthChecks("/health/live", new HealthCheckOptions
+				{
+					Predicate = _ => false
+				});
+
+				app.UseHealthChecks("/health/ready", new HealthCheckOptions
+				{
+					Predicate = registration => registration.Tags.Contains("ready")
+				});
+
 				app.Map("/live", b => b.Run(async liveOk => await liveOk.Response.CompleteAsync()));
 				app.Map("/ready", b => b.Run(async readyOk => await readyOk.Response.CompleteAsync()));
 				app.Map("/version", b => b.Run(async version =>
@@ -19,8 +31,6 @@ namespace OzonEdu.MerchandiseService.Infrastructure.StartapFilters
 					};
 					await version.Response.WriteAsJsonAsync(versionRespons);
 				}));
-
-				var apps = app.Build();
 
 				next(app);
 			};

@@ -32,13 +32,14 @@ namespace OzonEdu.MerchandiseService.Application.Behaviors
 			foreach (var entity in entities)
 			{
 				var domainEvents = new Queue<INotification>(entity.DomainEvents);
-				entity.ClearDomainEvents();
 
 				// Публикуем события домена
 				foreach (var domainEvent in domainEvents)
 				{
 					await _mediator.Publish(domainEvent, cancellationToken);
 				}
+
+				entity.ClearDomainEvents();
 				//TODO: Разработать систему Retry для повторных публикаций, упавшего события. Сделать сохранение событий, что не терять их. С последующей работой с ними 
 			}
 

@@ -1,53 +1,33 @@
-# Берет базовый образ, с которым начнёт работать докер
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS restore
 
-# Устанавливает внутри докер-контейнера базовую директорию, все команды после этой записи будут работать относительно этой директории. Если её нет - то она создатся
 WORKDIR /src
-
-# Копируем проект в докер, указывая какой проект необходим и куда
-COPY ["src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj","src/OzonEdu.MerchandiseService/"]
-
-# Обновляем зависимости в проекте
-RUN dotnet restore "./src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj"
-
-# Копирует всё из всё из указанной директории физического расположенного проекта, в директорию докера
 COPY . .
+RUN dotnet restore src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj
+RUN dotnet restore tests/OzonEdu.MerchandiseService.E2ETests/OzonEdu.MerchandiseService.E2ETests.csproj
 
-# Обновляем текущую директорию, чтобы могли билдить наш проект в докере
-WORKDIR "/src/src/OzonEdu.MerchandiseService"
+FROM restore AS build
+RUN dotnet build src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj -c Release --no-restore
 
-# Запускаем комманду Ран для билдинга
-RUN dotnet build "OzonEdu.MerchandiseService.csproj" -c Release -o /app/build
-
-# Публикуем из образа билд в publish. Так сказать ренейминг. В новую папку publish
 FROM build AS publish
-RUN dotnet publish "OzonEdu.MerchandiseService.csproj" -c Release -o /app/publish
-COPY "entrypoint.sh" "/app/publish/."
+RUN dotnet publish src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj -c Release -o /app/publish --no-build
 
-# Берем новый образ .Net для запуска в нём нашего приложения. 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS runtime
+FROM restore AS test-runner
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends bash curl \
+	&& rm -rf /var/lib/apt/lists/*
+RUN dotnet build tests/OzonEdu.MerchandiseService.E2ETests/OzonEdu.MerchandiseService.E2ETests.csproj -c Release --no-restore
+COPY entrypoint.e2e.sh /app/entrypoint.e2e.sh
+RUN chmod +x /app/entrypoint.e2e.sh
 
-# Создаём новую папку в новом контейнере
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+
 WORKDIR /app
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends bash curl \
+	&& rm -rf /var/lib/apt/lists/*
 
-# Какие порты будут выводить
-EXPOSE 80
-EXPOSE 443
-
-# Делаем финальный образ на базе runtime
-FROM runtime AS final
-
-# Создаём новую папку в новом образе
-WORKDIR /app
-
-# Копируем из publish образа, из папки в нём /app/publish в текущий контекст ( . ) final образа
 COPY --from=publish /app/publish .
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-# Точка, из которой контейнер будет исполняться
-#ENTRYPOINT ["dotnet","OzonEdu.MerchandiseService.dll"]
-
-# даём права
-RUN chmod +x entrypoint.sh
-
-# Запуск скрипта напрямую (JSON-массив для корректной обработки сигналов)
-CMD ["/bin/bash", "entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/app/entrypoint.sh"]
