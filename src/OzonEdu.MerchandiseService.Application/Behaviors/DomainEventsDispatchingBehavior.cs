@@ -5,48 +5,48 @@ using OzonEdu.MerchandiseService.Domain.Root;
 
 namespace OzonEdu.MerchandiseService.Application.Behaviors
 {
-	public class DomainEventsDispatchingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-		where TRequest : IRequest<TResponse>
-	{
-		private readonly IMediator _mediator;
-		private readonly MerchandiseDbContext _context;
+    public class DomainEventsDispatchingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
+    {
+        private readonly IMediator _mediator;
+        private readonly MerchandiseDbContext _context;
 
-		public DomainEventsDispatchingBehavior(IMediator mediator, MerchandiseDbContext context)
-		{
-			_mediator = mediator;
-			_context = context;
-		}
+        public DomainEventsDispatchingBehavior(IMediator mediator, MerchandiseDbContext context)
+        {
+            _mediator = mediator;
+            _context = context;
+        }
 
-		public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-		{
-			// Выполняем запрос
-			var response = await next();
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        {
+            // Выполняем запрос
+            var response = await next();
 
-			// Собираем и публикуем события домена
-			var entities = _context.ChangeTracker
-				.Entries<Entity>()
-				.Select(x => x.Entity)
-				.Where(x => x.DomainEvents.Any())
-				.ToList();
+            // Собираем и публикуем события домена
+            var entities = _context.ChangeTracker
+                .Entries<Entity>()
+                .Select(x => x.Entity)
+                .Where(x => x.DomainEvents.Any())
+                .ToList();
 
-			foreach (var entity in entities)
-			{
-				var domainEvents = new Queue<INotification>(entity.DomainEvents);
+            foreach (var entity in entities)
+            {
+                var domainEvents = new Queue<INotification>(entity.DomainEvents);
 
-				// Публикуем события домена
-				foreach (var domainEvent in domainEvents)
-				{
-					await _mediator.Publish(domainEvent, cancellationToken);
-				}
+                // Публикуем события домена
+                foreach (var domainEvent in domainEvents)
+                {
+                    await _mediator.Publish(domainEvent, cancellationToken);
+                }
 
-				entity.ClearDomainEvents();
-				//TODO: Разработать систему Retry для повторных публикаций, упавшего события. Сделать сохранение событий, что не терять их. С последующей работой с ними 
-			}
+                entity.ClearDomainEvents();
+                //TODO: Разработать систему Retry для повторных публикаций, упавшего события. Сделать сохранение событий, что не терять их. С последующей работой с ними 
+            }
 
 
-			return response;
-		}
-	}
+            return response;
+        }
+    }
 }
 //Просто программист, [03.06.2025 20:36]
 //Транзакция тут не нужна. НО у вас тут возможны ралли. Вы сначала публикуете события а потом делаете savechanges. И возможна такая ситуация. Что ваша БД по какой-то причине затупит. Консюмер получит событие, Запроси данные у вашего сервиса, а данные еще старые.

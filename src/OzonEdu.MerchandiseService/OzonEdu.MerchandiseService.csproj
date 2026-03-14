@@ -15,8 +15,8 @@
     <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.31.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.71.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.72.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5"/>
+    <PackageReference Include="Grpc.Tools" Version="2.72.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
@@ -39,12 +39,9 @@
   <ItemGroup>
 	  <ProjectReference Include="..\OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Application\OzonEdu.MerchandiseService.Application.csproj" />
-	  <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleGrpcClient\OzonEdu.MerchandiseService.ConsoleGrpcClient.csproj" />
-	  <ProjectReference Include="..\OzonEdu.MerchandiseService.ConsoleHttpClient\OzonEdu.MerchandiseService.ConsoleHttpClient.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.DataAccess.EntityFramework\OzonEdu.MerchandiseService.DataAccess.EntityFramework.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Domain\OzonEdu.MerchandiseService.Domain.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Grpc\OzonEdu.MerchandiseService.Grpc.csproj" />
-	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Http\OzonEdu.MerchandiseService.Http.csproj" />
 	  <ProjectReference Include="..\OzonEdu.MerchandiseService.Migrator\OzonEdu.MerchandiseService.Migrator.csproj" />
   </ItemGroup>
 </Project>

@@ -2,12 +2,12 @@
 
 namespace OzonEdu.MerchandiseService.Migrator.Migrations
 {
-	[Migration(10)]
-	public class FillData : ForwardOnlyMigration
-	{
-		public override void Up()
-		{
-			Execute.Sql(@"
+    [Migration(10)]
+    public class FillData : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Execute.Sql(@"
                 INSERT INTO skus (id, name, item_type_id, clothing_size, preset_type_id)
                 VALUES 
                     (1,  'TShirtStarter XS',  1, 1, 1),
@@ -63,6 +63,6 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
                     (51, 'PenVeteran', 16, null, 5),
                     (52, 'CardHolderVeteran', 17, null, 5)
                 ON CONFLICT DO NOTHING");
-		}
-	}
+        }
+    }
 }

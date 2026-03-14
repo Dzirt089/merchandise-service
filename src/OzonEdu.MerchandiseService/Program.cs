@@ -8,55 +8,52 @@ using OzonEdu.MerchandiseService.GrpcServices;
 using OzonEdu.MerchandiseService.Infrastructure;
 using OzonEdu.MerchandiseService.Infrastructure.Filters;
 using OzonEdu.MerchandiseService.Infrastructure.Repositories.Implementation;
-using OzonEdu.MerchandiseService.Services;
 
 using System.Diagnostics;
 public class Program
 {
-	private static void Main(string[] args)
-	{
-		var builder = WebApplication.CreateBuilder(args);
-		var configuration = builder.Configuration;
+    private static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        var configuration = builder.Configuration;
 
-		builder.Services.AddMediatR(cfg =>
-			cfg.RegisterServicesFromAssembly(typeof(GetRequestsByEmployeeQueryHandler).Assembly));
+        builder.Services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(typeof(GetRequestsByEmployeeQueryHandler).Assembly));
 
-		builder.Services.AddTransient(
-			typeof(IPipelineBehavior<,>),
-			typeof(DomainEventsDispatchingBehavior<,>));
+        builder.Services.AddTransient(
+            typeof(IPipelineBehavior<,>),
+            typeof(DomainEventsDispatchingBehavior<,>));
 
-		builder.Services.AddTransient(
-			typeof(IPipelineBehavior<,>),
-			typeof(UnitOfWorkBehavior<,>));
+        builder.Services.AddTransient(
+            typeof(IPipelineBehavior<,>),
+            typeof(UnitOfWorkBehavior<,>));
 
-		builder.Services.AddMerchandiseServicesEntityFrameworkDb(configuration);
+        builder.Services.AddMerchandiseServicesEntityFrameworkDb(configuration);
 
-		builder.AddInfrastructureLogger();
-		builder.AddInfrastructureOpenTelemetry();
-		builder.Services.AddEndpointsApiExplorer();
-		builder.ConfigurePorts();
-		builder.Services.AddStockGrpcServiceClient(configuration);
-		builder.Services.AddInfrastructureSwagger();
-		builder.Services.AddInfrastructureEndpoints();
-		builder.Services.AddInfrastructureMiddlewareGrpc();
-		builder.Services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
+        builder.AddInfrastructureLogger();
+        builder.AddInfrastructureOpenTelemetry();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.ConfigurePorts();
+        builder.Services.AddStockGrpcServiceClient(configuration);
+        builder.Services.AddInfrastructureSwagger();
+        builder.Services.AddInfrastructureEndpoints();
+        builder.Services.AddInfrastructureMiddlewareGrpc();
+        builder.Services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
 
-		builder.Services.AddSingleton(activSource => new ActivitySource("OzonEdu.MerchandiseService"));
+        builder.Services.AddSingleton(activSource => new ActivitySource("OzonEdu.MerchandiseService"));
 
-		builder.Services.AddSingleton<IMerchService, MerchService>();
+        builder.Services.AddScoped<ISkuPresetRepository, SkuPresetRepository>();
+        builder.Services.AddScoped<IMerchandiseRepository, MerchandiseRepository>();
 
-		builder.Services.AddScoped<ISkuPresetRepository, SkuPresetRepository>();
-		builder.Services.AddScoped<IMerchandiseRepository, MerchandiseRepository>();
+        var app = builder.Build();
 
-		var app = builder.Build();
+        // Подключаем миддлеваре библиотеки
+        app.AddInfrastructureMiddlewareHttp();
+        // app.UseHttpsRedirection();
 
-		// Подключаем миддлеваре библиотеки
-		app.AddInfrastructureMiddlewareHttp();
-		// app.UseHttpsRedirection();
+        app.UseAuthorization();
 
-		app.UseAuthorization();
-
-		app.MapGrpcService<MerchApiGrpsService>();
-		app.Run();
-	}
+        app.MapGrpcService<MerchApiGrpsService>();
+        app.Run();
+    }
 }

@@ -5,66 +5,66 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests;
 
 namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.ModelsConfigurations
 {
-	public class MerchandiseRequestConfiguration : IEntityTypeConfiguration<MerchandiseRequest>
-	{
-		public void Configure(EntityTypeBuilder<MerchandiseRequest> builder)
-		{
-			builder.ToTable("merchandise_requests");
-			builder.HasKey(r => r.Id);
-			builder.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+    public class MerchandiseRequestConfiguration : IEntityTypeConfiguration<MerchandiseRequest>
+    {
+        public void Configure(EntityTypeBuilder<MerchandiseRequest> builder)
+        {
+            builder.ToTable("merchandise_requests");
+            builder.HasKey(r => r.Id);
+            builder.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
-			// Используем поля для всех бэкинг-филдов
-			builder.UsePropertyAccessMode(PropertyAccessMode.Field);
+            // Используем поля для всех бэкинг-филдов
+            builder.UsePropertyAccessMode(PropertyAccessMode.Field);
 
-			// Бэкинг-филд для skuPresetId
-			builder.Property<long>("_skuPresetId")
-				   .HasColumnName("sku_preset_id")
-				   .IsRequired();
+            // Бэкинг-филд для skuPresetId
+            builder.Property<long>("_skuPresetId")
+                   .HasColumnName("sku_preset_id")
+                   .IsRequired();
 
-			// Проперти для статуса через ValueConverter
-			builder.Property(r => r.Status)
-				   .HasColumnName("merchandise_request_status")
-				   .HasConversion(
-					   vo => vo.Name,                            // to db: int
-					   v => MerchandiseRequestStatus.Parse(v))
-				   .IsRequired();
+            // Проперти для статуса через ValueConverter
+            builder.Property(r => r.Status)
+                   .HasColumnName("merchandise_request_status")
+                   .HasConversion(
+                       vo => vo.Name,                            // to db: int
+                       v => MerchandiseRequestStatus.Parse(v))
+                   .IsRequired();
 
-			builder.Property(r => r.CreatedAt)
-				   .HasColumnName("created_at")
-				   .IsRequired();
+            builder.Property(r => r.CreatedAt)
+                   .HasColumnName("created_at")
+                   .IsRequired();
 
-			builder.Property(r => r.GiveOutAt)
-				   .HasColumnName("give_out_at")
-				   .IsRequired(false);
+            builder.Property(r => r.GiveOutAt)
+                   .HasColumnName("give_out_at")
+                   .IsRequired(false);
 
-			// Навигация к SkuPreset через внешний ключ
-			builder.HasOne(r => r.SkuPreset)
-				   .WithMany()
-				   .HasForeignKey("_skuPresetId");
+            // Навигация к SkuPreset через внешний ключ
+            builder.HasOne(r => r.SkuPreset)
+                   .WithMany()
+                   .HasForeignKey("_skuPresetId");
 
-			builder.OwnsOne(r => r.Employee, eb =>
-			{
-				eb.WithOwner();  // важно для owned
+            builder.OwnsOne(r => r.Employee, eb =>
+            {
+                eb.WithOwner();  // важно для owned
 
-				// Email
-				eb.Property(e => e.Email)
-				  .HasColumnName("employee_email")
-				  .HasConversion(
-					  vo => vo.Value,
-					  str => Email.Create(str))
-				  .IsRequired()
-				  .HasMaxLength(255);
+                // Email
+                eb.Property(e => e.Email)
+                  .HasColumnName("employee_email")
+                  .HasConversion(
+                      vo => vo.Value,
+                      str => Email.Create(str))
+                  .IsRequired()
+                  .HasMaxLength(255);
 
-				eb.Property(e => e.ClothingSize)
-					.HasColumnName("clothing_size")
-					.HasConversion(
-						vo => vo.Name,
-						str => ClothingSize.Parse(str))
-					.IsRequired()
-					.HasMaxLength(255);
-			});
-		}
-	}
+                eb.Property(e => e.ClothingSize)
+                    .HasColumnName("clothing_size")
+                    .HasConversion(
+                        vo => vo.Name,
+                        str => ClothingSize.Parse(str))
+                    .IsRequired()
+                    .HasMaxLength(255);
+            });
+        }
+    }
 }
 
 

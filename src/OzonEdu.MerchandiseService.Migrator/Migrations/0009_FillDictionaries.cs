@@ -2,12 +2,12 @@
 
 namespace OzonEdu.MerchandiseService.Migrator.Migrations
 {
-	[Migration(9)]
-	public class FillDictionaries : ForwardOnlyMigration
-	{
-		public override void Up()
-		{
-			Execute.Sql(@"
+    [Migration(9)]
+    public class FillDictionaries : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Execute.Sql(@"
                 INSERT INTO clothing_sizes (id, name)
                 VALUES 
                     (1, 'XS'),
@@ -19,7 +19,7 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
                 ON CONFLICT DO NOTHING
             ");
 
-			Execute.Sql(@"
+            Execute.Sql(@"
                 INSERT INTO item_types (id, name)
                 VALUES 
                     (1,  'TShirtStarter'),
@@ -42,7 +42,7 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
                 ON CONFLICT DO NOTHING
             ");
 
-			Execute.Sql(@"
+            Execute.Sql(@"
                 INSERT INTO merchandise_request_status (id, name)
                 VALUES 
                     (1, 'New'),
@@ -52,7 +52,7 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
                 ON CONFLICT DO NOTHING
             ");
 
-			Execute.Sql(@"
+            Execute.Sql(@"
                 INSERT INTO preset_types (id, name)
                 VALUES 
                     (1, 'WelcomePack'),
@@ -62,6 +62,6 @@ namespace OzonEdu.MerchandiseService.Migrator.Migrations
                     (5, 'VeteranPack')
                 ON CONFLICT DO NOTHING
             ");
-		}
-	}
+        }
+    }
 }

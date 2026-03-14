@@ -2,12 +2,12 @@
 
 namespace OzonEdu.MerchandiseService.Migrator.Migrations
 {
-	[Migration(14)]
-	public class SeedSkuPresets : ForwardOnlyMigration
-	{
-		public override void Up()
-		{
-			Execute.Sql(@"
+    [Migration(14)]
+    public class SeedSkuPresets : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Execute.Sql(@"
 DO $$
 BEGIN
 	IF EXISTS (SELECT 1 FROM sku_presets) THEN
@@ -52,6 +52,6 @@ BEGIN
 		ON skus.preset_type_id = numbered_sizes.preset_type_id
 		AND (skus.clothing_size = numbered_sizes.clothing_size OR skus.clothing_size IS NULL);
 END $$;");
-		}
-	}
+        }
+    }
 }

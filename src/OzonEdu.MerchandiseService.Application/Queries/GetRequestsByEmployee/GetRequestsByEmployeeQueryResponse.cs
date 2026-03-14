@@ -2,8 +2,8 @@
 
 namespace OzonEdu.MerchandiseService.Application.Queries.GetRequestsByEmployee
 {
-	public class GetRequestsByEmployeeQueryResponse
-	{
-		public IReadOnlyCollection<MerchandiseRequestDataDto> Items { get; set; }
-	}
+    public class GetRequestsByEmployeeQueryResponse
+    {
+        public IReadOnlyCollection<MerchandiseRequestDataDto> Items { get; set; }
+    }
 }

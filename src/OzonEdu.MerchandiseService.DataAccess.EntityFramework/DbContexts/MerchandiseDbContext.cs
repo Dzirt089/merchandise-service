@@ -7,47 +7,47 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
 
 namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts
 {
-	public class MerchandiseDbContext : DbContext
-	{
-		public DbSet<MerchandiseRequest> MerchandiseRequests => Set<MerchandiseRequest>();
-		public DbSet<SkuPreset> SkuPresets => Set<SkuPreset>();
-		public DbSet<IntegrationOutboxMessage> IntegrationOutboxMessages => Set<IntegrationOutboxMessage>();
-		public DbSet<IntegrationInboxMessage> IntegrationInboxMessages => Set<IntegrationInboxMessage>();
+    public class MerchandiseDbContext : DbContext
+    {
+        public DbSet<MerchandiseRequest> MerchandiseRequests => Set<MerchandiseRequest>();
+        public DbSet<SkuPreset> SkuPresets => Set<SkuPreset>();
+        public DbSet<IntegrationOutboxMessage> IntegrationOutboxMessages => Set<IntegrationOutboxMessage>();
+        public DbSet<IntegrationInboxMessage> IntegrationInboxMessages => Set<IntegrationInboxMessage>();
 
-		public DbSet<SkuDbModel> Skus => Set<SkuDbModel>();
+        public DbSet<SkuDbModel> Skus => Set<SkuDbModel>();
 
-		public MerchandiseDbContext(DbContextOptions<MerchandiseDbContext> options) : base(options) { }
+        public MerchandiseDbContext(DbContextOptions<MerchandiseDbContext> options) : base(options) { }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
-			modelBuilder.ApplyConfiguration(new MerchandiseRequestConfiguration());
-			modelBuilder.ApplyConfiguration(new SkuPresetConfiguration());
-			modelBuilder.ApplyConfiguration(new IntegrationOutboxMessageConfiguration());
-			modelBuilder.ApplyConfiguration(new IntegrationInboxMessageConfiguration());
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new MerchandiseRequestConfiguration());
+            modelBuilder.ApplyConfiguration(new SkuPresetConfiguration());
+            modelBuilder.ApplyConfiguration(new IntegrationOutboxMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new IntegrationInboxMessageConfiguration());
 
-			modelBuilder.Entity<SkuDbModel>(b =>
-			{
-				b.ToTable("skus");
-				b.HasKey(x => x.Id);
-				b.Property(x => x.Id).HasColumnName("id");
+            modelBuilder.Entity<SkuDbModel>(b =>
+            {
+                b.ToTable("skus");
+                b.HasKey(x => x.Id);
+                b.Property(x => x.Id).HasColumnName("id");
 
-				b.Property(x => x.ItemTypeId)
-					.HasColumnName("item_type_id")
-					.IsRequired();
+                b.Property(x => x.ItemTypeId)
+                    .HasColumnName("item_type_id")
+                    .IsRequired();
 
-				b.Property(x => x.ClothingSize)
-					.HasColumnName("clothing_size");
+                b.Property(x => x.ClothingSize)
+                    .HasColumnName("clothing_size");
 
-				b.Property(x => x.PresetTypeId)
-					.HasColumnName("preset_type_id")
-					.IsRequired();
+                b.Property(x => x.PresetTypeId)
+                    .HasColumnName("preset_type_id")
+                    .IsRequired();
 
-				b.Property(x => x.Name)
-					.HasColumnName("name")
-					.IsRequired();
-			});
-		}
-	}
+                b.Property(x => x.Name)
+                    .HasColumnName("name")
+                    .IsRequired();
+            });
+        }
+    }
 }
 
 //// Переводчик для обычных дат (не null)

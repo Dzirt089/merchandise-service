@@ -4,11 +4,11 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.MerchandiseRequests.Do
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
-	public sealed class MerchandiseRequestDeclinedHandler : INotificationHandler<MerchandiseRequestDeclinedDomainEvent>
-	{
-		public Task Handle(MerchandiseRequestDeclinedDomainEvent notification, CancellationToken cancellationToken)
-		{
-			return Task.CompletedTask;
-		}
-	}
+    public sealed class MerchandiseRequestDeclinedHandler : INotificationHandler<MerchandiseRequestDeclinedDomainEvent>
+    {
+        public Task Handle(MerchandiseRequestDeclinedDomainEvent notification, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }
