@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace OzonEdu.MerchandiseService.Application.Handlers
 {
-	public sealed class NewMerchandiseAppearedCommandHandler : IRequestHandler<NewMerchandiseAppearedCommand>
+	public sealed class NewMerchandiseAppearedCommandHandler : IRequestHandler<NewMerchandiseAppearedCommand, Unit>
 	{
 		private const string EmailNotificationTopic = "email_notification_event";
 		private readonly ActivitySource _activitySource;
@@ -31,7 +31,7 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 			_activitySource = activitySource ?? MerchandiseTelemetry.ActivitySource;
 		}
 
-		public async Task Handle(NewMerchandiseAppearedCommand request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(NewMerchandiseAppearedCommand request, CancellationToken cancellationToken)
 		{
 			using var activity = _activitySource.StartActivity("CommandHandler.NewMerchandiseAppeared", ActivityKind.Internal);
 
@@ -74,6 +74,8 @@ namespace OzonEdu.MerchandiseService.Application.Handlers
 					}
 				}
 			}
+
+			return Unit.Value;
 		}
 	}
 }

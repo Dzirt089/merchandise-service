@@ -77,7 +77,7 @@ public sealed class MerchandiseServiceE2ETests : IClassFixture<MerchandiseEnviro
 		var email = $"stock-replenished-{Guid.NewGuid():N}@example.com";
 
 		await _fixture.InsertProcessingRequestAsync(email, presetCandidate);
-		await _fixture.PublishStockReplenishedEventAsync(presetCandidate.SkuIds.First());
+		await _fixture.PublishStockReplenishedEventAsync(presetCandidate.SkuIds);
 
 		await _fixture.WaitForRequestStatusAsync(email, "done", TimeSpan.FromSeconds(60));
 	}

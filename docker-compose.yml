@@ -10,6 +10,8 @@ services:
     depends_on:
       merchandise-services-db:
         condition: service_healthy
+      stock-api:
+        condition: service_started
       broker:
         condition: service_started
       kafka-init:
@@ -31,7 +33,7 @@ services:
       StockApiGrpcServiceConfiguration__ServerAddress: "http://stock-api:82"
       DatabaseConnectionOptions__ConnectionString: "Host=merchandise-services-db;Port=5432;Database=merchandise-services;Username=postgres;Password=merchandiseServicesPassword"
     volumes:
-      - merch-logs:/app/Logs
+      - ./.docker/logs:/app/Logs
     healthcheck:
       test: ["CMD-SHELL", "curl --fail --silent http://localhost/health/ready || exit 1"]
       interval: 10s
@@ -149,7 +151,7 @@ services:
         condition: service_healthy
     command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
     volumes:
-      - merch-logs:/logs
+      - ./.docker/logs:/logs
       - ./observability/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
       - ./observability/fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
     networks:
@@ -274,6 +276,8 @@ services:
     depends_on:
       merchandise-services:
         condition: service_healthy
+      stock-api:
+        condition: service_started
       kafka-init:
         condition: service_completed_successfully
       jaeger:
@@ -307,5 +311,4 @@ networks:
 volumes:
   esdata:
   grafana-data:
-  merch-logs:
   prometheus-data:

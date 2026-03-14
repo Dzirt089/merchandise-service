@@ -84,7 +84,17 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
 		var stockQuantities = stockItems.Items.ToDictionary(x => x.Sku, x => x.Quantity);
 		var candidates = await LoadPresetCandidatesAsync();
 
-		var candidate = candidates.FirstOrDefault(x => x.SkuIds.All(skuId => stockQuantities.TryGetValue(skuId, out var quantity) && quantity > 0));
+		var candidate = candidates
+			.Select(candidate => new
+			{
+				Candidate = candidate,
+				MinimumQuantity = candidate.SkuIds.Min(skuId => stockQuantities.TryGetValue(skuId, out var quantity) ? quantity : 0)
+			})
+			.Where(x => x.MinimumQuantity > 0)
+			.OrderByDescending(x => x.MinimumQuantity)
+			.Select(x => x.Candidate)
+			.FirstOrDefault();
+
 		return candidate ?? throw new InvalidOperationException("No preset with positive stock quantities was found in stock-api.");
 	}
 
@@ -168,23 +178,23 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
 		await PublishJsonMessageAsync(EmployeeNotificationTopic, email, notification);
 	}
 
-	public async Task PublishStockReplenishedEventAsync(long skuId)
+	public async Task PublishStockReplenishedEventAsync(IEnumerable<long> skuIds)
 	{
+		var replenishedSkuIds = skuIds.Distinct().ToArray();
 		var stockReplenishedEvent = new StockReplenishedEvent
 		{
-			Type =
-			[
-				new StockReplenishedItem
+			Type = replenishedSkuIds
+				.Select(skuId => new StockReplenishedItem
 				{
 					Sku = skuId,
 					ItemTypeId = 0,
 					ItemTypeName = string.Empty,
 					ClothingSize = null
-				}
-			]
+				})
+				.ToList()
 		};
 
-		await PublishJsonMessageAsync(StockReplenishedTopic, skuId.ToString(), stockReplenishedEvent);
+		await PublishJsonMessageAsync(StockReplenishedTopic, string.Join(",", replenishedSkuIds), stockReplenishedEvent);
 	}
 
 	public async Task WaitForRequestStatusAsync(string email, string expectedStatus, TimeSpan timeout)
@@ -230,14 +240,14 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
 	{
 		await WaitForAsync(async () =>
 		{
-			using var response = await ElasticsearchClient.GetAsync("/merchandise-service-logs*/_search?q=service:merchandise-service");
+			using var response = await ElasticsearchClient.GetAsync("/merchandise-service-logs*/_count");
 			if (!response.IsSuccessStatusCode)
 			{
 				return false;
 			}
 
 			var payload = JsonNode.Parse(await response.Content.ReadAsStringAsync());
-			return payload?["hits"]?["hits"] is JsonArray hits && hits.Count > 0;
+			return payload?["count"]?.GetValue<int>() > 0;
 		}, timeout, "indexed logs");
 	}
 
