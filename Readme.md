@@ -2,7 +2,7 @@
 
 ## Быстрый старт
 
-Поднять весь Docker-контур:
+Поднять локальный контур:
 
 ```bash
 docker compose up -d --build
@@ -14,244 +14,72 @@ docker compose up -d --build
 docker compose down
 ```
 
-Если нужно пересобрать только сервис и лог-шейпер:
+## Shell E2E
+
+Основной e2e-путь теперь shell-based и совпадает по подходу с `stock-api`:
 
 ```bash
-docker compose up -d --build merchandise-services fluent-bit
+bash tests/e2e/compose-e2e.sh
 ```
 
-## E2E-тесты
+Скрипт поднимает полный Docker-контур, проверяет HTTP, Kafka, Prometheus, Fluent Bit, Loki и Tempo, а затем удаляет окружение.
 
-Собрать тестовый образ:
+## Локальные проверки
 
-```bash
-docker compose --profile test build test-runner
-```
+- readiness: `curl http://localhost:8080/health/ready`
+- metrics: `curl http://localhost:8080/metrics`
+- HTTP список мерча: `curl http://localhost:8080/Merchandise/GetAllMerch`
+- HTTP получение по `id`: `curl http://localhost:8080/Merchandise/GetById/1`
+- логи сервиса: `docker compose logs -f merchandise-services`
 
-Запустить полный e2e-прогон:
-
-```bash
-docker compose --profile test run --rm test-runner
-```
-
-Тесты проверяют:
-
-- HTTP endpoints
-- gRPC endpoints
-- взаимодействие с `stock-api`
-- inbound Kafka события
-- outbound Kafka события
-- traces, metrics и logs внутри Docker-контура
-
-## Что открывать в браузере
+## Observability URLs
 
 - Swagger: `http://localhost:8080/swagger`
-- Jaeger: `http://localhost:16686`
-- Kibana: `http://localhost:5601`
 - Prometheus: `http://localhost:9090`
 - Grafana: `http://localhost:3000`
+- Loki API: `http://localhost:5310`
+- Tempo API: `http://localhost:5320`
 
 Grafana по умолчанию:
 
 - логин: `admin`
 - пароль: `admin`
 
-## Порты сервисов
+## Порты
 
 - `merchandise-service` HTTP: `8080`
 - `merchandise-service` gRPC: `5062`
 - `stock-api` HTTP: `5070`
 - `stock-api` gRPC: `5072`
-- Elasticsearch: `9200`
-- Kibana: `5601`
-- Jaeger UI: `16686`
 - Prometheus: `9090`
 - Grafana: `3000`
+- Loki: `5310`
+- Tempo: `5320`
 - Kafka broker: `9092`
 
-## Полезные проверки руками
+## Что проверять в observability
 
-Проверить readiness:
+В Prometheus:
 
-```bash
-curl http://localhost:8080/health/ready
-```
+- таргеты `merchandise-service` и `fluent-bit` должны быть `up`
 
-Проверить метрики:
+В Grafana:
 
-```bash
-curl http://localhost:8080/metrics
-```
+- datasource’ы `Prometheus`, `Loki`, `Tempo`
+- dashboard `Merchandise Service Observability`
 
-Проверить HTTP endpoint:
+В Loki:
 
-```bash
-curl http://localhost:8080/Merchandise/GetAllMerch
-```
+- логи `merchandise-service`, пришедшие через Fluent Bit
 
-Посмотреть логи сервиса:
+В Tempo:
 
-```bash
-docker compose logs -f merchandise-services
-```
+- trace после HTTP или Kafka-driven сценария
 
-Посмотреть логи `stock-api`:
+## Secondary .NET E2E
+
+`.NET` e2e-проект сохранён как дополнительный слой и может запускаться отдельно, если локально доступен `dotnet`:
 
 ```bash
-docker compose logs -f stock-api
+dotnet test tests/OzonEdu.MerchandiseService.E2ETests/OzonEdu.MerchandiseService.E2ETests.csproj
 ```
-
-Посмотреть логи shipper'а логов:
-
-```bash
-docker compose logs -f fluent-bit
-```
-
-## HTTP
-
-Проверить список мерча:
-
-```bash
-curl http://localhost:8080/Merchandise/GetAllMerch
-```
-
-Проверить получение сущности по `id`:
-
-```bash
-curl http://localhost:8080/Merchandise/GetById/1
-```
-
-Для ручной проверки через браузер удобнее использовать Swagger:
-
-- `http://localhost:8080/swagger`
-
-## gRPC
-
-gRPC сервис доступен на:
-
-- `localhost:5062`
-
-Что проверять:
-
-- `GiveOutMerchandise`
-- `GetRequestsByEmployee`
-
-Внутри e2e это уже покрыто контейнером `test-runner`. Для ручной проверки можно использовать `grpcurl` или Postman с поддержкой gRPC.
-
-## Kafka
-
-Используемые топики:
-
-- `stock_replenished_event`
-- `employee_notification_event`
-- `email_notification_event`
-
-Что проверяется автоматически в e2e:
-
-- входящий `employee_notification_event`
-- входящий `stock_replenished_event`
-- исходящий `email_notification_event`
-
-Что проверять руками через логи:
-
-```bash
-docker compose logs -f merchandise-services
-```
-
-При необходимости можно смотреть состояние Kafka через контейнер `broker`.
-
-## Traces
-
-Открыть Jaeger:
-
-- `http://localhost:16686`
-
-Что должно быть видно:
-
-- HTTP trace при вызове controller endpoint
-- gRPC trace при вызове gRPC метода
-- внутренние span'ы handler/repository
-- исходящий gRPC client вызов в `stock-api`
-
-Минимальный smoke-сценарий:
-
-1. Открыть `http://localhost:8080/swagger`
-2. Вызвать `GetAllMerch`
-3. Перейти в Jaeger
-4. Выбрать сервис `OzonEdu.MerchandiseService`
-5. Найти свежий trace
-
-## Logs
-
-Открыть Kibana:
-
-- `http://localhost:5601`
-
-Индекс логов:
-
-- `merchandise-service-logs-*`
-
-Где лежат файловые логи сервиса локально:
-
-- `./.docker/logs`
-
-Что смотреть:
-
-- HTTP request logs
-- gRPC interceptor logs
-- ошибки Kafka consumer/publisher
-- correlation по `TraceId` и `SpanId`
-
-## Metrics
-
-Проверить endpoint метрик:
-
-```bash
-curl http://localhost:8080/metrics
-```
-
-Открыть Prometheus:
-
-- `http://localhost:9090`
-
-Открыть Grafana:
-
-- `http://localhost:3000`
-
-Что смотреть:
-
-- `up` по сервису
-- HTTP latency
-- request count
-- runtime/process metrics
-
-Базовый smoke-сценарий:
-
-1. Вызвать HTTP endpoint сервиса
-2. Проверить `http://localhost:8080/metrics`
-3. Убедиться, что Prometheus видит job `merchandise-service`
-4. Открыть Grafana и проверить dashboard
-
-## Что смотреть в observability
-
-В Jaeger:
-
-- HTTP traces сервиса
-- gRPC server traces
-- gRPC client вызовы в `stock-api`
-
-В Kibana:
-
-- индекс `merchandise-service-logs-*`
-
-В Prometheus / Grafana:
-
-- readiness и app metrics
-- HTTP latency / request count
-- runtime метрики процесса
-
-## Примечания
-
-- Kafka topics создаются контейнером `kafka-init`
-- файловые логи сервиса пишутся в `./.docker/logs`
-- e2e-тесты запускаются только против Docker-контура, не против локального `dotnet run`

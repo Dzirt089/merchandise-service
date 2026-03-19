@@ -16,6 +16,7 @@
 
 ## Что уже сделано
 
+- Создан recovery-файл и он объявлен обязательным source of truth при восстановлении.
 - Удален `test-runner` stage из `Dockerfile`.
 - Удален старый `entrypoint.e2e.sh`.
 - В `docker-compose.yml` начата миграция с `Jaeger + Elasticsearch/Kibana` на `otel-collector + loki + tempo`.
@@ -33,10 +34,13 @@
   - `observability/loki/config.yaml`
   - `observability/tempo/tempo.yaml`
 - Обновлен `merchandise-service.sln` под новые observability-файлы и удаление `entrypoint.e2e.sh`.
+- Сделан промежуточный commit `f1ae6fa` с observability migration.
+- Добавлен shell E2E скрипт `tests/e2e/compose-e2e.sh`.
+- `Readme.md` переписан под `Collector + Loki + Tempo + shell E2E`.
 
 ## Что делаю прямо сейчас
 
-Этап 1 почти завершен: нужно проверить текущий diff на синтаксические/структурные ошибки в `docker-compose.yml` и связных конфигах, затем сделать промежуточный git commit.
+Этап 2 завершается: фиксирую shell E2E и README отдельным коротким commit, затем перехожу к адаптации `.NET` E2E под Tempo/Loki.
 
 ## Что осталось сделать по плану
 
