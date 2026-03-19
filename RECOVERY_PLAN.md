@@ -37,10 +37,11 @@
 - Сделан промежуточный commit `f1ae6fa` с observability migration.
 - Добавлен shell E2E скрипт `tests/e2e/compose-e2e.sh`.
 - `Readme.md` переписан под `Collector + Loki + Tempo + shell E2E`.
+- Сделан промежуточный commit `1c6d200` с shell E2E и обновленным README.
 
 ## Что делаю прямо сейчас
 
-Этап 2 завершается: фиксирую shell E2E и README отдельным коротким commit, затем перехожу к адаптации `.NET` E2E под Tempo/Loki.
+Этап 3: адаптирую secondary `.NET` E2E под Tempo/Loki и после этого делаю следующий короткий commit.
 
 ## Что осталось сделать по плану
 

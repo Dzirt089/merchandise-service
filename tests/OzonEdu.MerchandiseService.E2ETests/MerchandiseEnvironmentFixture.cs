@@ -13,9 +13,9 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
     };
 
     public HttpClient HttpClient { get; }
-    public HttpClient JaegerClient { get; }
+    public HttpClient TempoClient { get; }
     public HttpClient PrometheusClient { get; }
-    public HttpClient ElasticsearchClient { get; }
+    public HttpClient LokiClient { get; }
     public string DatabaseConnectionString { get; }
     public string KafkaBootstrapServers { get; }
     public string EmailNotificationTopic { get; } = "email_notification_event";
@@ -30,18 +30,18 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
         var serviceHttpUrl = Environment.GetEnvironmentVariable("SERVICE_HTTP_URL") ?? "http://merchandise-services";
         var serviceGrpcUrl = Environment.GetEnvironmentVariable("SERVICE_GRPC_URL") ?? "http://merchandise-services:82";
         var stockApiGrpcUrl = Environment.GetEnvironmentVariable("STOCK_API_GRPC_URL") ?? "http://stock-api:82";
-        var jaegerUrl = Environment.GetEnvironmentVariable("JAEGER_URL") ?? "http://jaeger:16686";
+        var tempoUrl = Environment.GetEnvironmentVariable("TEMPO_URL") ?? "http://tempo:3200";
         var prometheusUrl = Environment.GetEnvironmentVariable("PROMETHEUS_URL") ?? "http://prometheus:9090";
-        var elasticsearchUrl = Environment.GetEnvironmentVariable("ELASTICSEARCH_URL") ?? "http://elasticsearch:9200";
+        var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL") ?? "http://loki:3100";
 
         DatabaseConnectionString = Environment.GetEnvironmentVariable("SERVICE_DB_CONNECTION_STRING")
             ?? "Host=merchandise-services-db;Port=5432;Database=merchandise-services;Username=postgres;Password=merchandiseServicesPassword";
         KafkaBootstrapServers = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP_SERVERS") ?? "broker:29092";
 
         HttpClient = new HttpClient { BaseAddress = new Uri(serviceHttpUrl) };
-        JaegerClient = new HttpClient { BaseAddress = new Uri(jaegerUrl) };
+        TempoClient = new HttpClient { BaseAddress = new Uri(tempoUrl) };
         PrometheusClient = new HttpClient { BaseAddress = new Uri(prometheusUrl) };
-        ElasticsearchClient = new HttpClient { BaseAddress = new Uri(elasticsearchUrl) };
+        LokiClient = new HttpClient { BaseAddress = new Uri(lokiUrl) };
 
         var merchChannel = GrpcChannel.ForAddress(serviceGrpcUrl);
         MerchandiseGrpcClient = new MerchandiseServiceGrpc.MerchandiseServiceGrpcClient(merchChannel);
@@ -65,9 +65,9 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
                 return false;
             }
         }, TimeSpan.FromSeconds(60), "stock-api gRPC readiness");
-        await WaitForHttpAsync(() => JaegerClient.GetAsync("/api/services"), "jaeger");
+        await WaitForHttpAsync(() => TempoClient.GetAsync("/ready"), "tempo");
         await WaitForHttpAsync(() => PrometheusClient.GetAsync("/-/ready"), "prometheus");
-        await WaitForHttpAsync(() => ElasticsearchClient.GetAsync("/_cluster/health"), "elasticsearch");
+        await WaitForHttpAsync(() => LokiClient.GetAsync("/ready"), "loki");
         await WaitForAsync(async () =>
         {
             await EnsureSkuPresetsSeededAsync();
@@ -209,15 +209,15 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
     {
         await WaitForAsync(async () =>
         {
-            using var response = await JaegerClient.GetAsync("/api/traces?service=OzonEdu.MerchandiseService&limit=20");
+            using var response = await TempoClient.GetAsync("/api/search?tags=service.name%3DOzonEdu.MerchandiseService&limit=20");
             if (!response.IsSuccessStatusCode)
             {
                 return false;
             }
 
             var payload = JsonNode.Parse(await response.Content.ReadAsStringAsync());
-            return payload?["data"] is JsonArray data && data.Count > 0;
-        }, timeout, "jaeger traces");
+            return payload?["traces"] is JsonArray data && data.Count > 0;
+        }, timeout, "tempo traces");
     }
 
     public async Task WaitForPrometheusMetricsAsync(TimeSpan timeout)
@@ -239,15 +239,17 @@ public sealed class MerchandiseEnvironmentFixture : IAsyncLifetime
     {
         await WaitForAsync(async () =>
         {
-            using var response = await ElasticsearchClient.GetAsync("/merchandise-service-logs*/_count");
+            var end = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var start = end - 600;
+            using var response = await LokiClient.GetAsync($"/loki/api/v1/query_range?query=%7Bjob%3D%22fluent-bit%22%7D%20%7C%3D%20%22OzonEdu.MerchandiseService%22&limit=20&start={start}000000000&end={end}000000000");
             if (!response.IsSuccessStatusCode)
             {
                 return false;
             }
 
             var payload = JsonNode.Parse(await response.Content.ReadAsStringAsync());
-            return payload?["count"]?.GetValue<int>() > 0;
-        }, timeout, "indexed logs");
+            return payload?["data"]?["result"] is JsonArray result && result.Count > 0;
+        }, timeout, "loki logs");
     }
 
     private async Task EnsureSkuPresetsSeededAsync()
