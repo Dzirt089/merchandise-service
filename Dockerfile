@@ -2,6 +2,12 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS restore
 WORKDIR /src
 
 COPY ["src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj", "src/OzonEdu.MerchandiseService/"]
+COPY ["src/OzonEdu.Infrastructure/OzonEdu.MerchandiseService.Infrastructure.csproj", "src/OzonEdu.Infrastructure/"]
+COPY ["src/OzonEdu.MerchandiseService.Application/OzonEdu.MerchandiseService.Application.csproj", "src/OzonEdu.MerchandiseService.Application/"]
+COPY ["src/OzonEdu.MerchandiseService.DataAccess.EntityFramework/OzonEdu.MerchandiseService.DataAccess.EntityFramework.csproj", "src/OzonEdu.MerchandiseService.DataAccess.EntityFramework/"]
+COPY ["src/OzonEdu.MerchandiseService.Domain/OzonEdu.MerchandiseService.Domain.csproj", "src/OzonEdu.MerchandiseService.Domain/"]
+COPY ["src/OzonEdu.MerchandiseService.Grpc/OzonEdu.MerchandiseService.Grpc.csproj", "src/OzonEdu.MerchandiseService.Grpc/"]
+COPY ["src/OzonEdu.MerchandiseService.Migrator/OzonEdu.MerchandiseService.Migrator.csproj", "src/OzonEdu.MerchandiseService.Migrator/"]
 COPY ["tests/OzonEdu.MerchandiseService.E2ETests/OzonEdu.MerchandiseService.E2ETests.csproj", "tests/OzonEdu.MerchandiseService.E2ETests/"]
 
 RUN dotnet restore "src/OzonEdu.MerchandiseService/OzonEdu.MerchandiseService.csproj"

@@ -38,10 +38,11 @@
 - Добавлен shell E2E скрипт `tests/e2e/compose-e2e.sh`.
 - `Readme.md` переписан под `Collector + Loki + Tempo + shell E2E`.
 - Сделан промежуточный commit `1c6d200` с shell E2E и обновленным README.
+- Во время реального запуска shell E2E найден build-дефект в `Dockerfile`: до `dotnet restore` не копировались project references.
 
 ## Что делаю прямо сейчас
 
-Этап 3: адаптирую secondary `.NET` E2E под Tempo/Loki и после этого делаю следующий короткий commit.
+Этап 4: чиню `Dockerfile` после реального прогона shell E2E и затем снова возвращаюсь к верификации нового пути.
 
 ## Что осталось сделать по плану
 
