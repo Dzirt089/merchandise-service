@@ -16,10 +16,14 @@ services:
         condition: service_started
       kafka-init:
         condition: service_completed_successfully
-      jaeger:
+      otel-collector:
         condition: service_started
-      elasticsearch:
-        condition: service_healthy
+      fluent-bit:
+        condition: service_started
+      loki:
+        condition: service_started
+      tempo:
+        condition: service_started
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       DOTNET_RUNNING_IN_CONTAINER: "true"
@@ -27,13 +31,11 @@ services:
       GRPC_PORT: "82"
       DB_HOST: "merchandise-services-db"
       DB_PORT: "5432"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
+      Telemetry__OtlpEndpoint: "http://otel-collector:4317"
       Kafka__Enabled: "true"
       Kafka__BootstrapServers: "broker:29092"
       StockApiGrpcServiceConfiguration__ServerAddress: "http://stock-api:82"
       DatabaseConnectionOptions__ConnectionString: "Host=merchandise-services-db;Port=5432;Database=merchandise-services;Username=postgres;Password=merchandiseServicesPassword"
-    volumes:
-      - ./.docker/logs:/app/Logs
     healthcheck:
       test: ["CMD-SHELL", "curl --fail --silent http://localhost/health/ready || exit 1"]
       interval: 10s
@@ -42,6 +44,12 @@ services:
     networks:
       - merch-network
     restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        fluentd-async: "true"
+        tag: merchandise-service
 
   stock-api:
     image: ghcr.io/dzirt089/ozonedu.stockapi:master
@@ -49,22 +57,30 @@ services:
       - "5070:80"
       - "5072:82"
     environment:
-      OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger
-      OTEL_EXPORTER_JAEGER_AGENT_PORT: "6831"
-      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      Telemetry__OtlpEndpoint: "http://otel-collector:4317"
       DatabaseConnectionOptions__ConnectionString: "Host=stock-api-db;Port=5432;Database=stock-api;Username=postgres;Password=stockApiPassword"
     depends_on:
       stock-api-db:
         condition: service_healthy
-      jaeger:
+      otel-collector:
         condition: service_started
-      elasticsearch:
-        condition: service_healthy
       broker:
+        condition: service_started
+      fluent-bit:
+        condition: service_started
+      loki:
+        condition: service_started
+      tempo:
         condition: service_started
     networks:
       - merch-network
     restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        fluentd-async: "true"
+        tag: stock-api
 
   merchandise-services-db:
     image: postgres:16
@@ -102,82 +118,64 @@ services:
     networks:
       - merch-network
 
-  elasticsearch:
-    image: elastic/elasticsearch:7.17.17
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.147.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
     volumes:
-      - esdata:/usr/share/elasticsearch/data
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: "false"
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      - ./observability/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
     ports:
-      - "9200:9200"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
+      - "54317:4317"
     restart: unless-stopped
     networks:
       - merch-network
 
-  kibana:
-    image: elastic/kibana:7.17.17
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      xpack.security.enabled: "false"
+  loki:
+    image: grafana/loki:3.6.7
+    command: ["-config.file=/etc/loki/config.yaml"]
+    volumes:
+      - ./observability/loki/config.yaml:/etc/loki/config.yaml:ro
     ports:
-      - "5601:5601"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fs http://localhost:5601/api/status || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 20
+      - "5310:3100"
     networks:
       - merch-network
     restart: unless-stopped
 
   fluent-bit:
-    image: fluent/fluent-bit:3.1
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+    image: fluent/fluent-bit:4.2.3
     command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+    ports:
+      - "5240:2020"
+      - "24224:24224"
+    depends_on:
+      loki:
+        condition: service_started
     volumes:
-      - ./.docker/logs:/logs
       - ./observability/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
       - ./observability/fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
     networks:
       - merch-network
     restart: unless-stopped
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.64.0
+  tempo:
+    image: grafana/tempo:2.9.1
+    command: ["-target=all", "-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./observability/tempo/tempo.yaml:/etc/tempo.yaml:ro
     ports:
-      - "6831:6831/udp"
-      - "14268:14268"
-      - "16686:16686"
-      - "4317:4317"
-    environment:
-      COLLECTOR_OTLP_ENABLED: "true"
+      - "5320:3200"
+      - "54318:4317"
+      - "54319:4318"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:16686/ >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3200/ready >/dev/null || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 12
+      retries: 20
     networks:
       - merch-network
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:v3.2.1
+    image: prom/prometheus:v3.10.0
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -187,20 +185,17 @@ services:
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"
-    depends_on:
-      merchandise-services:
-        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/ready >/dev/null || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 12
+      retries: 10
     networks:
       - merch-network
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:11.5.2
+    image: grafana/grafana:12.4.1
     ports:
       - "3000:3000"
     environment:
@@ -213,12 +208,14 @@ services:
       - ./observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
     depends_on:
       prometheus:
-        condition: service_healthy
-      jaeger:
-        condition: service_healthy
+        condition: service_started
+      loki:
+        condition: service_started
+      tempo:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health >/dev/null || exit 1"]
-      interval: 15s
+      interval: 10s
       timeout: 5s
       retries: 20
     networks:
@@ -250,6 +247,12 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
     networks:
       - merch-network
     restart: unless-stopped
@@ -257,58 +260,22 @@ services:
   kafka-init:
     image: confluentinc/cp-kafka:7.7.1
     depends_on:
-      - broker
-    entrypoint: ["/bin/bash", "-c"]
-    command:
-      - >
-        cub kafka-ready -b broker:29092 1 60 &&
-        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic stock_replenished_event --replication-factor 1 --partitions 1 &&
-        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic employee_notification_event --replication-factor 1 --partitions 1 &&
-        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic email_notification_event --replication-factor 1 --partitions 1
+      broker:
+        condition: service_healthy
+    entrypoint:
+      - /bin/bash
+      - -lc
+      - |
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic stock_replenished_event --partitions 1 --replication-factor 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic employee_notification_event --partitions 1 --replication-factor 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic email_notification_event --partitions 1 --replication-factor 1
     networks:
       - merch-network
-
-  test-runner:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      target: test-runner
-    depends_on:
-      merchandise-services:
-        condition: service_healthy
-      stock-api:
-        condition: service_started
-      kafka-init:
-        condition: service_completed_successfully
-      jaeger:
-        condition: service_healthy
-      prometheus:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      fluent-bit:
-        condition: service_started
-    environment:
-      ASPNETCORE_ENVIRONMENT: "Test"
-      SERVICE_HTTP_URL: "http://merchandise-services"
-      SERVICE_GRPC_URL: "http://merchandise-services:82"
-      STOCK_API_GRPC_URL: "http://stock-api:82"
-      SERVICE_DB_CONNECTION_STRING: "Host=merchandise-services-db;Port=5432;Database=merchandise-services;Username=postgres;Password=merchandiseServicesPassword"
-      KAFKA_BOOTSTRAP_SERVERS: "broker:29092"
-      JAEGER_URL: "http://jaeger:16686"
-      PROMETHEUS_URL: "http://prometheus:9090"
-      ELASTICSEARCH_URL: "http://elasticsearch:9200"
-    entrypoint: ["/bin/bash", "/app/entrypoint.e2e.sh"]
-    networks:
-      - merch-network
-    profiles:
-      - test
 
 networks:
   merch-network:
     driver: bridge
 
 volumes:
-  esdata:
   grafana-data:
   prometheus-data:

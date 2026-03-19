@@ -121,10 +121,10 @@ namespace OzonEdu.MerchandiseService.Infrastructure
                         .AddGrpcClientInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation()
                         .AddSqlClientInstrumentation()
-                        .AddConsoleExporter()
                         .AddOtlpExporter(options =>
                         {
-                            var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+                            var endpoint = app.Configuration["Telemetry:OtlpEndpoint"]
+                                ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
                                 ?? app.Configuration["OpenTelemetry:OtlpEndpoint"]
                                 ?? "http://localhost:4317";
 

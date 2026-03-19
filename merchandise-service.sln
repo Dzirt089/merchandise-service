@@ -8,14 +8,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D606625A-3E64-488F-80C2-47B0ADF6D433}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8DCAAB3D-4F2C-46B1-8F13-5E9F08AC03F0}"
-	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-		Dockerfile = Dockerfile
-		entrypoint.e2e.sh = entrypoint.e2e.sh
-		entrypoint.sh = entrypoint.sh
-		Readme.md = Readme.md
-	EndProjectSection
-EndProject
+		ProjectSection(SolutionItems) = preProject
+			docker-compose.yml = docker-compose.yml
+			Dockerfile = Dockerfile
+			entrypoint.sh = entrypoint.sh
+			Readme.md = Readme.md
+		EndProjectSection
+	EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService", "src\OzonEdu.MerchandiseService\OzonEdu.MerchandiseService.csproj", "{0C1846F7-64FB-4724-8D59-56002CFA63C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OzonEdu.MerchandiseService.Infrastructure", "src\OzonEdu.Infrastructure\OzonEdu.MerchandiseService.Infrastructure.csproj", "{E6BD7EE7-9677-4D83-A4B8-C9F67686C404}"
@@ -49,11 +48,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fluent-bit", "fluent-bit", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "grafana", "grafana", "{D8ED528D-1A1A-47E3-B4A5-DA68F42E56D1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prometheus", "prometheus", "{F72DBE69-B913-42B2-B1F7-F40CAA4EB5DB}"
-	ProjectSection(SolutionItems) = preProject
-		observability\prometheus\prometheus.yml = observability\prometheus\prometheus.yml
-	EndProjectSection
-EndProject
+	Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prometheus", "prometheus", "{F72DBE69-B913-42B2-B1F7-F40CAA4EB5DB}"
+		ProjectSection(SolutionItems) = preProject
+			observability\prometheus\prometheus.yml = observability\prometheus\prometheus.yml
+			observability\otel-collector-config.yaml = observability\otel-collector-config.yaml
+			observability\loki\config.yaml = observability\loki\config.yaml
+			observability\tempo\tempo.yaml = observability\tempo\tempo.yaml
+		EndProjectSection
+	EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "provisioning", "provisioning", "{7B3E3724-FFCC-49D4-9D3F-DA883D3258C0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dashboards", "dashboards", "{48124153-4CA0-4C4E-A70F-E7847F028848}"
