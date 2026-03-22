@@ -5,6 +5,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Integration\**" />
+    <EmbeddedResource Remove="Integration\**" />
+    <None Remove="Integration\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.31.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
@@ -19,9 +24,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Integration\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OzonEdu.MerchandiseService.DataAccess.EntityFramework\OzonEdu.MerchandiseService.DataAccess.EntityFramework.csproj" />

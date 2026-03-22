@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Merchandise Service
+    orgId: 1
+    folder: Merchandise Service
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

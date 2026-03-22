@@ -5,35 +5,35 @@ using OzonEdu.MerchandiseService.Domain.AggregationModels.SkuPresets;
 
 namespace OzonEdu.MerchandiseService.DataAccess.EntityFramework.DbContexts.ModelsConfigurations
 {
-	internal class SkuPresetConfiguration : IEntityTypeConfiguration<SkuPreset>
-	{
-		public void Configure(EntityTypeBuilder<SkuPreset> builder)
-		{
-			builder.ToTable("sku_presets");
+    internal class SkuPresetConfiguration : IEntityTypeConfiguration<SkuPreset>
+    {
+        public void Configure(EntityTypeBuilder<SkuPreset> builder)
+        {
+            builder.ToTable("sku_presets");
 
-			builder.HasKey(p => p.Id);
+            builder.HasKey(p => p.Id);
 
-			builder.Property(x => x.Id)
-				.HasColumnName("id")
-				.ValueGeneratedOnAdd()
-				.UseIdentityColumn();
+            builder.Property(x => x.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd()
+                .UseIdentityColumn();
 
-			builder.Property(p => p.Type)
-								.HasColumnName("preset_type_id")
-								.HasConversion(
-									v => v.Id,
-									i => PresetType.Parse(i))
-								.IsRequired();
+            builder.Property(p => p.Type)
+                .HasColumnName("preset_type_id")
+                .HasConversion(
+                    v => v.Id,
+                    i => PresetType.Parse(i))
+                .IsRequired();
 
-			builder.OwnsMany<Sku>("SkuCollection", sa =>
-			{
-				sa.WithOwner().HasForeignKey("sku_preset_id");
-				sa.Property<long>("Value").HasColumnName("sku_id");
-				sa.HasKey("sku_preset_id", "Value");
-				sa.ToTable("sku_preset_skus");
-			});
-		}
-	}
+            builder.OwnsMany<Sku>("SkuCollection", sa =>
+            {
+                sa.WithOwner().HasForeignKey("sku_preset_id");
+                sa.Property<long>("Value").HasColumnName("sku_id");
+                sa.HasKey("sku_preset_id", "Value");
+                sa.ToTable("sku_preset_skus");
+            });
+        }
+    }
 }
 
 
