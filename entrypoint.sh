@@ -8,34 +8,34 @@ HTTP_PORT="${HTTP_PORT:-80}"
 STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-120}"
 
 wait_for_tcp() {
-	local host="$1"
-	local port="$2"
-	local deadline=$((SECONDS + STARTUP_TIMEOUT_SECONDS))
+    local host="$1"
+    local port="$2"
+    local deadline=$((SECONDS + STARTUP_TIMEOUT_SECONDS))
 
-	while (( SECONDS < deadline )); do
-		if bash -c ":</dev/tcp/${host}/${port}" 2>/dev/null; then
-			return 0
-		fi
-		sleep 2
-	done
+    while (( SECONDS < deadline )); do
+        if bash -c ":</dev/tcp/${host}/${port}" 2>/dev/null; then
+            return 0
+        fi
+        sleep 2
+    done
 
-	echo "Timed out waiting for ${host}:${port}" >&2
-	return 1
+    echo "Timed out waiting for ${host}:${port}" >&2
+    return 1
 }
 
 wait_for_http() {
-	local url="$1"
-	local deadline=$((SECONDS + STARTUP_TIMEOUT_SECONDS))
+    local url="$1"
+    local deadline=$((SECONDS + STARTUP_TIMEOUT_SECONDS))
 
-	while (( SECONDS < deadline )); do
-		if curl --silent --fail "$url" >/dev/null; then
-			return 0
-		fi
-		sleep 2
-	done
+    while (( SECONDS < deadline )); do
+        if curl --silent --fail "$url" >/dev/null; then
+            return 0
+        fi
+        sleep 2
+    done
 
-	echo "Timed out waiting for ${url}" >&2
-	return 1
+    echo "Timed out waiting for ${url}" >&2
+    return 1
 }
 
 echo "Waiting for Postgres at ${DB_HOST}:${DB_PORT}"
