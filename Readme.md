@@ -22,14 +22,13 @@ docker compose down
 bash tests/e2e/compose-e2e.sh
 ```
 
-Скрипт поднимает полный Docker-контур, проверяет HTTP, Kafka, Prometheus, Fluent Bit, Loki и Tempo, а затем удаляет окружение.
+Скрипт поднимает полный Docker-контур, проверяет HTTP infrastructure endpoints (`health`, `metrics`, `swagger`), Kafka, Prometheus, Fluent Bit, Loki и Tempo, а затем удаляет окружение.
 
 ## Локальные проверки
 
 - readiness: `curl http://localhost:8080/health/ready`
 - metrics: `curl http://localhost:8080/metrics`
-- HTTP список мерча: `curl http://localhost:8080/Merchandise/GetAllMerch`
-- HTTP получение по `id`: `curl http://localhost:8080/Merchandise/GetById/1`
+- Swagger spec: `curl http://localhost:8080/swagger/v1/swagger.json`
 - логи сервиса: `docker compose logs -f merchandise-services`
 
 ## Observability URLs

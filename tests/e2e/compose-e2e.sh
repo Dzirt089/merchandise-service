@@ -54,24 +54,17 @@ wait_for_internal_http "http://loki:3100/ready" 180
 wait_for_internal_http "http://tempo:3200/ready" 180
 wait_for_internal_http "http://fluent-bit:2020/api/v1/metrics/prometheus" 180
 
-HTTP_PAYLOAD="$(curl -fsS http://localhost:8080/Merchandise/GetAllMerch)"
-if [[ "$HTTP_PAYLOAD" != *"TShirtStarter XS"* ]]; then
-  echo "Unexpected HTTP payload from merchandise-service." >&2
-  echo "$HTTP_PAYLOAD" >&2
+SWAGGER_STATUS="$(curl -s -o /tmp/swagger.out -w '%{http_code}' http://localhost:8080/swagger)"
+if [[ "$SWAGGER_STATUS" != "301" ]]; then
+  echo "Expected /swagger to return 301 redirect, got $SWAGGER_STATUS." >&2
+  cat /tmp/swagger.out >&2
   exit 1
 fi
 
-HTTP_GET_BY_ID_STATUS="$(curl -s -o /tmp/merch-getbyid.out -w '%{http_code}' http://localhost:8080/Merchandise/GetById/1)"
-if [[ "$HTTP_GET_BY_ID_STATUS" != "200" ]]; then
-  echo "Expected GetById/1 to return 200, got $HTTP_GET_BY_ID_STATUS." >&2
-  cat /tmp/merch-getbyid.out >&2
-  exit 1
-fi
-
-NOT_FOUND_STATUS="$(curl -s -o /tmp/merch-notfound.out -w '%{http_code}' http://localhost:8080/Merchandise/GetById/999999)"
-if [[ "$NOT_FOUND_STATUS" != "404" ]]; then
-  echo "Expected GetById/999999 to return 404, got $NOT_FOUND_STATUS." >&2
-  cat /tmp/merch-notfound.out >&2
+SWAGGER_SPEC="$(curl -fsS http://localhost:8080/swagger/v1/swagger.json)"
+if [[ "$SWAGGER_SPEC" != *"\"openapi\""* ]]; then
+  echo "Swagger spec is not available on /swagger/v1/swagger.json." >&2
+  echo "$SWAGGER_SPEC" >&2
   exit 1
 fi
 
@@ -149,7 +142,8 @@ if [[ "$PROM_TARGETS" != *"merchandise-service"* ]] || [[ "$PROM_TARGETS" != *"f
   exit 1
 fi
 
-if ! curl -fsS "http://localhost:8080/metrics" | grep -q "http_requests_received_total"; then
+METRICS_PAYLOAD="$(curl -fsS http://localhost:8080/metrics)"
+if [[ "$METRICS_PAYLOAD" != *"http_requests_received_total"* ]]; then
   echo "Application metrics endpoint does not expose HTTP metrics." >&2
   exit 1
 fi

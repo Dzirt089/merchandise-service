@@ -12,20 +12,24 @@ public sealed class MerchandiseServiceE2ETests : IClassFixture<MerchandiseEnviro
     }
 
     [Fact]
-    public async Task HttpEndpoints_ReturnExpectedPayload()
+    public async Task HttpEndpoints_ReturnInfrastructurePayloads()
     {
-        using var getAllResponse = await _fixture.HttpClient.GetAsync("/Merchandise/GetAllMerch");
-        Assert.Equal(HttpStatusCode.OK, getAllResponse.StatusCode);
+        using var readinessResponse = await _fixture.HttpClient.GetAsync("/health/ready");
+        Assert.Equal(HttpStatusCode.OK, readinessResponse.StatusCode);
 
-        var items = JsonNode.Parse(await getAllResponse.Content.ReadAsStringAsync())?.AsArray();
-        Assert.NotNull(items);
-        Assert.NotEmpty(items!);
+        using var metricsResponse = await _fixture.HttpClient.GetAsync("/metrics");
+        Assert.Equal(HttpStatusCode.OK, metricsResponse.StatusCode);
+        var metricsPayload = await metricsResponse.Content.ReadAsStringAsync();
+        Assert.Contains("http_requests_received_total", metricsPayload);
 
-        using var getByIdResponse = await _fixture.HttpClient.GetAsync("/Merchandise/GetById/1");
-        Assert.Equal(HttpStatusCode.OK, getByIdResponse.StatusCode);
+        using var swaggerRedirectResponse = await _fixture.HttpClient.GetAsync("/swagger");
+        Assert.Equal(HttpStatusCode.MovedPermanently, swaggerRedirectResponse.StatusCode);
 
-        using var notFoundResponse = await _fixture.HttpClient.GetAsync("/Merchandise/GetById/999999");
-        Assert.Equal(HttpStatusCode.NotFound, notFoundResponse.StatusCode);
+        using var swaggerSpecResponse = await _fixture.HttpClient.GetAsync("/swagger/v1/swagger.json");
+        Assert.Equal(HttpStatusCode.OK, swaggerSpecResponse.StatusCode);
+
+        var swaggerSpec = JsonNode.Parse(await swaggerSpecResponse.Content.ReadAsStringAsync());
+        Assert.NotNull(swaggerSpec?["openapi"]?.GetValue<string>());
     }
 
     [Fact]
@@ -83,7 +87,7 @@ public sealed class MerchandiseServiceE2ETests : IClassFixture<MerchandiseEnviro
     [Fact]
     public async Task ObservabilityStack_CollectsTracesMetricsAndLogs()
     {
-        using var response = await _fixture.HttpClient.GetAsync("/Merchandise/GetAllMerch");
+        using var response = await _fixture.HttpClient.GetAsync("/metrics");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         await _fixture.WaitForTraceAsync(TimeSpan.FromSeconds(60));
